@@ -45,7 +45,8 @@ class Car(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect_w = self.rect.size[0]
         self.rect_h = self.rect.size[1]
-        self.image_orig = pygame.transform.scale(self.image, (int(self.rect_w / 2), int(self.rect_h / 2)))
+        self.image_orig = pygame.transform.scale(
+            self.image, (int(self.rect_w / 2), int(self.rect_h / 2)))
         self.screen = pygame.display.get_surface()
         self.area = self.screen.get_rect()
         self.x = init_x
@@ -53,7 +54,8 @@ class Car(pygame.sprite.Sprite):
         self.rect.topleft = 800 - self.rect_w / 2, 500 - self.rect_h / 2
 
         self.dir = init_dir
-        self.image, self.rect = rot_center(self.image_orig, self.rect, self.dir)
+        self.image, self.rect = rot_center(
+            self.image_orig, self.rect, self.dir)
         self.speed = 0.0
 
         self.maxspeed = 3
@@ -94,13 +96,15 @@ class Car(pygame.sprite.Sprite):
         self.dir = self.dir + self.steering
         if self.dir > 360:
             self.dir = 0
-        self.image, self.rect = rot_center(self.image_orig, self.rect, self.dir)
+        self.image, self.rect = rot_center(
+            self.image_orig, self.rect, self.dir)
 
     def steerright(self):
         self.dir = self.dir - self.steering
         if self.dir < 0:
             self.dir = 360
-        self.image, self.rect = rot_center(self.image_orig, self.rect, self.dir)
+        self.image, self.rect = rot_center(
+            self.image_orig, self.rect, self.dir)
 
     def find_way_direction(self):
         next_nav_index = self.current_nav_index + 1
@@ -110,8 +114,9 @@ class Car(pygame.sprite.Sprite):
     def calculate_distance_lamp(self):
         for i in range(len(TRAFFIC_LAMP_POS)):
             pos = TRAFFIC_LAMP_POS[i]
-            if  self.current_nav_index < pos:
-                distance_to_lamp = math.hypot(MAP_NAVS[pos][0] - self.x, MAP_NAVS[pos][1] - self.y)
+            if self.current_nav_index < pos:
+                distance_to_lamp = math.hypot(
+                    MAP_NAVS[pos][0] - self.x, MAP_NAVS[pos][1] - self.y)
                 if self.current_lamp_pos != i:
                     self.current_lamp_pos = i
 
@@ -122,7 +127,8 @@ class Car(pygame.sprite.Sprite):
         if stone_status[0] == 0:
             return 200000
         pos = stone_status[1]
-        distance_to_impediment = math.hypot(MAP_NAVS[pos][0] - self.x, MAP_NAVS[pos][1] - self.y)
+        distance_to_impediment = math.hypot(
+            MAP_NAVS[pos][0] - self.x, MAP_NAVS[pos][1] - self.y)
         return distance_to_impediment
 
     def calculator_car_angle(self):
@@ -148,11 +154,12 @@ class Car(pygame.sprite.Sprite):
                 angle = self.dir_factor * float(target_dir - self.dir)
                 change_dir = angle if angle < 2 else 2
                 self.dir += change_dir
-        self.image, self.rect = rot_center(self.image_orig, self.rect, self.dir)
+        self.image, self.rect = rot_center(
+            self.image_orig, self.rect, self.dir)
 
     def update_acceleration(self, speed):
         off_set = speed - self.speed
-        self.acceleration = off_set/10.0
+        self.acceleration = off_set / 10.0
         # if speed < 0.1:
         #     self.speed = speed
         #     return
@@ -180,27 +187,32 @@ class Car(pygame.sprite.Sprite):
                 stone_hide_view = stone_status[0]
                 stone_pos = stone_status[1]
                 if stone_hide_view == 1 and stone_pos <= TRAFFIC_LAMP_POS[self.current_lamp_pos]:
-                    distance_stone = self.calculate_distance_impediment(stone_status)
-                    speed_new = self.impediment_deductive.fuzzy_deductive(distance_stone, angle_tmp)
+                    distance_stone = self.calculate_distance_impediment(
+                        stone_status)
+                    speed_new = self.impediment_deductive.fuzzy_deductive(
+                        distance_stone, angle_tmp)
                     # print("Distance to Stone: ", distance_stone)
 
                     # self.speed = speed_new
                     # self.update_speed(speed_new)
                     self.update_acceleration(speed_new)
                     print("Stone - Speed: ", self.speed)
-                    print("--------------------------------------------------------------------------")
+                    print(
+                        "--------------------------------------------------------------------------")
                 elif stone_hide_view == 1 and self.current_nav_index > TRAFFIC_LAMP_POS[self.current_lamp_pos]:
-                    distance_stone = self.calculate_distance_impediment(stone_status)
-                    speed_new = self.impediment_deductive.fuzzy_deductive(distance_stone, angle_tmp)
+                    distance_stone = self.calculate_distance_impediment(
+                        stone_status)
+                    speed_new = self.impediment_deductive.fuzzy_deductive(
+                        distance_stone, angle_tmp)
                     # print("Distance to Stone: ", distance_stone)
                     # self.speed = speed_new
                     # self.update_speed(speed_new)
                     self.update_acceleration(speed_new)
                     print("Stone - Speed: ", self.speed)
-                    print("--------------------------------------------------------------------------")
+                    print(
+                        "--------------------------------------------------------------------------")
                 else:
                     distance_tmp = self.calculate_distance_lamp()
-                    print("OKKK :", self.current_lamp_pos)
                     lamp_status_tmp = traffic_lamp_status[self.current_lamp_pos]
                     # print("current lamp pos: ", self.current_lamp_pos, ", status: ", lamp_status_tmp)
                     # print(distance_tmp, " - ", cal_distance_dependencies(distance_tmp))
@@ -212,12 +224,14 @@ class Car(pygame.sprite.Sprite):
                     #     light = "green"
 
                     # print("lamp status: ", light, " - ", lamp_status_tmp[0], "s")
-                    speed_new = self.light_deductive.fuzzy_deductive(distance_tmp, lamp_status_tmp, angle_tmp)
+                    speed_new = self.light_deductive.fuzzy_deductive(
+                        distance_tmp, lamp_status_tmp, angle_tmp)
                     # self.speed = speed_new
                     # self.update_speed(speed_new)
                     self.update_acceleration(speed_new)
                     print("Traffic Lamp - Speed: ", self.speed)
-                    print("--------------------------------------------------------------------------")
+                    print(
+                        "--------------------------------------------------------------------------")
             self.update_speed()
 
         else:

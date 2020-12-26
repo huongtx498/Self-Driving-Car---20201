@@ -1,132 +1,36 @@
-import pygame
-import xlrd
 import math
 import numpy as np
 import itertools
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-from graphic.loader import load_image
-from fuzzy_base.dijkstra import get_path
 
-# Map filenames.
-MAP_NAVS = []  # mảng tọa độ (x, y) của các điểm trung tâm
-LINE_NAVS = []
+# pos = {1: (164, 179), 20: (183, 230), 19: (201, 284), 2: (291, 147), 3: (357, 132), 21: (314, 182), 5: (321, 255), 4: (401, 212),
+#        10: (471, 95), 12: (482, 38), 25: (521, 48), 13: (561, 32), 11: (549, 71), 22: (530, 119), 15: (494, 176), 16: (573, 165)}
 
-FINISH_INDEX = 0
+# margin = {20: [1, 19], 21: [2, 3, 4, 5], 22: [10, 11, 16, 15], 25: [12, 13]}
 
-# mảng các vị trí của đèn giao thông (số thứ tự điểm trong chuỗi điểm đường đi - là số thứ tự điểm, k phải tọa độ)
-TRAFFIC_LAMP_POS = []
-# mảng thông tin chi tiết của đèn tín hiệu: tọa độ x, y, hướng của đèn, index
-TRAFFIC_LAMP_COORDINATES = []
+# path = [20, 21, 22, 25]
 
-pos = dict()
-margin = dict()
-listPoint = []
+
+pos = {3: (2328, 2688), 93: (2358, 2664), 183: (2328, 2736), 4: (2022, 2598), 94: (2064, 2568), 184: (2040, 2646), 272: (1986, 2628),
+       300: (2010, 2550), 18: (1848, 2538), 108: (1860, 2508), 198: (1824, 2574), 19: (1602, 2460), 109: (1614, 2430), 199: (1566, 2496), 20: (1416, 2406), 110: (1458, 2376), 200: (1434, 2454), 277: (1380, 2436), 305: (1404, 2358), 17: (1374, 2538), 107: (1398, 2538), 197: (1350, 2532)}
+
+margin = {3: [93, 183], 4: [94, 184, 272, 300], 18: [108, 198],
+          19: [109, 199], 20: [110, 200, 277, 305], 17: [107, 197]}
+
+path = [3, 4, 18, 19, 20, 17]
 
 margin_path = []
 margin_point1 = []
 margin_point2 = []
 
 
-class Map(pygame.sprite.Sprite):
-    def __init__(self, init_x, init_y, map_number):
-        pygame.sprite.Sprite.__init__(self)
-
-        self.map_number = map_number
-        image_temp = "map" + str(map_number) + ".png"
-        self.get_map_navs()
-        self.image = load_image(image_temp)
-        self.rect = self.image.get_rect()
-        self.rect_w = self.rect.size[0]
-        self.rect_h = self.rect.size[1]
-        self.image = pygame.transform.scale(
-            self.image, (int(self.rect_w * 6), int(self.rect_h * 6)))
-        self.x = init_x
-        self.y = init_y
-        blue = 230, 30, 30
-        print("POS: ", pos)
-        print("------------------------------------------------------------")
-        print("LISTPOINT: ", listPoint)
-        print("------------------------------------------------------------")
-        print("MARGIN: ", margin)
-        print("------------------------------------------------------------")
-        margin_path = draw_margin(listPoint, margin, pos)
-        print(print("MARGIN PATH: ", margin_path))
-        print("------------------------------------------------------------")
-
-        margin_point1, margin_point2 = getMarginPoint(margin, margin_path)
-        pygame.draw.lines(self.image, blue, False, margin_point1, 5)
-        pygame.draw.lines(self.image, blue, False, margin_point2, 5)
-
-    # Realign the map
-
-    def update(self, cam_x, cam_y):
-        self.rect.topleft = self.x - cam_x + 800, self.y - cam_y + 500
-
-    def get_map_navs(self):
-        with xlrd.open_workbook('../media/toa-do.xlsx') as book:
-            # listP, dis = get_path(82, 37)
-            listP, dis = get_path(3, 17)
-            sheet = book.sheet_by_index(0)
-            for pointid in listP:
-                listPoint.append(pointid)
-                for row_num in range(sheet.nrows):
-                    row_value = sheet.row_values(row_num)
-                    if row_value[0] == pointid:
-                        # both center & margin point
-                        pos[int(row_value[0])] = (
-                            int(row_value[1]) * 6, int(row_value[2]) * 6)
-                        pos[int(row_value[3])] = (
-                            int(row_value[4]) * 6, int(row_value[5]) * 6)
-                        pos[int(row_value[6])] = (
-                            int(row_value[7]) * 6, int(row_value[8]) * 6)
-                        if row_value[9] != '':
-                            pos[int(row_value[9])] = (
-                                int(row_value[10]) * 6, int(row_value[11]) * 6)
-                            pos[int(row_value[12])] = (
-                                int(row_value[13]) * 6, int(row_value[14]) * 6)
-
-                        # margin point
-                        margin[int(row_value[0])] = [
-                            int(row_value[3]), int(row_value[6])]
-                        if row_value[9] != '':
-                            margin[int(row_value[0])].extend(
-                                [int(row_value[9]), int(row_value[12])])
-
-                        MAP_NAVS.append(
-                            (int(row_value[1]) * 6, int(row_value[2]) * 6, int(row_value[0])))
-
-                        # center line point
-                        LINE_NAVS.append(
-                            (int(row_value[1]) * 6, int(row_value[2]) * 6))
-
-            sheet = book.sheet_by_index(1)
-            i = 0.0
-            j = 0
-            for pointid in listPoint:
-                for row_num in range(sheet.nrows):
-                    row_value = sheet.row_values(row_num)
-                    if row_value[5] == pointid:
-                        # TRAFFIC_LAMP_POS.append(int(row_value[5]))
-                        TRAFFIC_LAMP_POS.append(
-                            listPoint.index(int(row_value[5])))
-                        TRAFFIC_LAMP_COORDINATES.append(
-                            (int(row_value[1]) * 6, int(row_value[2]) * 6, int(row_value[3]), i))
-                        i = i + 1.0
-                    j = j + 1
-            print("TRAFFIC LAMP POS: ", TRAFFIC_LAMP_COORDINATES)
-            print("------------------------------------------------------------")
-
-
-def draw_margin(listPoint, margin, pos):
+def draw_margin(path, margin, pos):
     margin_path = []
     cent_lines = []
-    for i in range(len(listPoint) - 1):
-        # print("check {} - {}".format(listPoint[i], listPoint[i + 1]))
-        cent_lines.append((listPoint[i], listPoint[i + 1]))
-        pos_1 = pos[listPoint[i]]
-        pos_2 = pos[listPoint[i + 1]]
+    for i in range(len(path) - 1):
+        # print("check {} - {}".format(path[i], path[i + 1]))
+        cent_lines.append((path[i], path[i + 1]))
+        pos_1 = pos[path[i]]
+        pos_2 = pos[path[i + 1]]
         A = [pos_1, pos_2]
         margin_path = list(set(margin_path))
 
@@ -139,9 +43,9 @@ def draw_margin(listPoint, margin, pos):
 
         # print("pos: {}".format(A))
         d = linear(pos_1, pos_2)
-        margin_1 = margin[listPoint[i]]
+        margin_1 = margin[path[i]]
         # print("margin1: {}".format(margin_1))
-        margin_2 = margin[listPoint[i + 1]]
+        margin_2 = margin[path[i + 1]]
         # print("margin2: {}".format(margin_2))
         margin_1p, margin_1n = side(d, margin_1)
         # print("margin1p: {}, margin1n: {}".format(margin_1p, margin_1n))
@@ -172,10 +76,9 @@ def draw_margin(listPoint, margin, pos):
         able_draw_n = [item[0] for item in margin_n_with_dist[:num_point - 1]]
         margin_path.extend(able_draw_n)
 
-        if len(margin[listPoint[i]]) == 4:
+        if len(margin[path[i]]) == 4:
             for j in range(3):
-                able_draw = (margin[listPoint[i]][j],
-                             margin[listPoint[i]][j + 1])
+                able_draw = (margin[path[i]][j], margin[path[i]][j + 1])
                 B = [pos[able_draw[0]], pos[able_draw[1]]]
                 if is_intersected(A, B) == False:
                     margin_path.append(able_draw)
@@ -228,7 +131,6 @@ def intersect_point(dA, dB):
 def dist_point_point(a, b):
     pos_a = a
     pos_b = b
-
     return math.sqrt((pos_a[0] - pos_b[0])**2 + (pos_a[1] - pos_b[1])**2)
 
 
@@ -291,8 +193,6 @@ def getMarginLine(startP, margin_Path):
 
 
 def getMarginPoint(margin, margin_path):
-    print("Get Margin Point: ", margin)
-
     listP = []
     for path in margin_path:
         for point in path:
@@ -316,3 +216,9 @@ def side(d, list_points):
         else:
             negatives.append(p)
     return positives, negatives
+
+
+margin_path = draw_margin(path, margin, pos)
+margin_point1, margin_point2 = getMarginPoint(margin, margin_path)
+print(margin_point1)
+print(margin_point2)

@@ -90,7 +90,8 @@ class Graph(object):
 
 
 def get_path(start, end):
-    adj_mx, coor = pickle.load(open("/home/huongtx/Documents/IT4844/fuzzy-logic-project/fuzzy_base/point.p", "rb"))
+    adj_mx, coor = pickle.load(open(
+        "/home/huongtx/Documents/IT4844/fuzzy-logic-project/fuzzy_base/point.p", "rb"))
     graph = Graph()
     for i, a in enumerate(adj_mx):
         for j, b in enumerate(a):

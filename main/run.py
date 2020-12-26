@@ -1,7 +1,7 @@
-import random
 import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+import random
 from graphic.car import calculate_angle
 from graphic import car
 from pygame.locals import *
@@ -10,6 +10,7 @@ import graphic.stone as stone
 import pygame
 import graphic.maps as maps
 import graphic.camera as camera
+
 
 def main():
     clock = pygame.time.Clock()
@@ -112,10 +113,6 @@ def main():
         # update and render car
         cars.update(cam.x, cam.y, traffic_lamps_status, stone_status, flag)
         cars.draw(screen)
-        # blue = 230, 30, 30
-        # point1 = 635, 525
-        # point2 = 165, 167
-        # pygame.draw.lines(screen, blue, False, [(100,100), (150,200), (200,100), point1, point2], 5)
         pygame.display.flip()
 
         clock.tick(60)
