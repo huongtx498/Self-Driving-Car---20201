@@ -10,13 +10,15 @@ import itertools
 # path = [20, 21, 22, 25]
 
 
-pos = {3: (2328, 2688), 93: (2358, 2664), 183: (2328, 2736), 4: (2022, 2598), 94: (2064, 2568), 184: (2040, 2646), 272: (1986, 2628),
-       300: (2010, 2550), 18: (1848, 2538), 108: (1860, 2508), 198: (1824, 2574), 19: (1602, 2460), 109: (1614, 2430), 199: (1566, 2496), 20: (1416, 2406), 110: (1458, 2376), 200: (1434, 2454), 277: (1380, 2436), 305: (1404, 2358), 17: (1374, 2538), 107: (1398, 2538), 197: (1350, 2532)}
+pos = {82: (3810, 3150), 172: (3810, 3102), 262: (3810, 3174), 83: (3492, 3054), 173: (3486, 3120), 263: (3492, 3036), 50: (3204, 2952),
+       140: (3264, 2952), 230: (3222, 2994), 285: (3174, 2976), 313: (3198, 2928), 84: (3012, 2904), 174: (3024, 2868), 264: (3006, 2928),
+       1: (2814, 2820), 91: (2844, 2814), 181: (2832, 2886), 271: (2784, 2874), 299: (2784, 2796), 44: (2766, 2652), 134: (2790, 2646),
+       224: (2748, 2652), 45: (2700, 2418), 135: (2724, 2418), 225: (2682, 2436)}
 
-margin = {3: [93, 183], 4: [94, 184, 272, 300], 18: [108, 198],
-          19: [109, 199], 20: [110, 200, 277, 305], 17: [107, 197]}
+margin = {82: [172, 262], 83: [173, 263], 50: [140, 230, 285, 313], 84: [
+    174, 264], 1: [91, 181, 271, 299], 44: [134, 224], 45: [135, 225]}
 
-path = [3, 4, 18, 19, 20, 17]
+path = [82, 83, 50, 84, 1, 44, 45]
 
 margin_path = []
 margin_point1 = []
@@ -144,6 +146,9 @@ def is_intersected(A, B):
     dB = linear(B_0, B_1)
     x = intersect_point(dA, dB)
 
+    if x is None:
+        return False
+
     dist_a = dist_point_point(x, A_0) + dist_point_point(x, A_1)
     dist_b = dist_point_point(x, B_0) + dist_point_point(x, B_1)
 
@@ -192,6 +197,13 @@ def getMarginLine(startP, margin_Path):
     return lineP
 
 
+def converIndexToNavs(listIndex, pos):
+    navs = []
+    for index in listIndex:
+        navs.append(pos[index])
+    return navs
+
+
 def getMarginPoint(margin, margin_path):
     listP = []
     for path in margin_path:
@@ -199,8 +211,14 @@ def getMarginPoint(margin, margin_path):
             if checkStartEndPoint(point, margin_path):
                 listP.append(point)
     start = getStartPoint(listP, margin)
-    margin_point1 = getMarginLine(start[0], margin_path)
-    margin_point2 = getMarginLine(start[1], margin_path)
+    margin_point_index_1 = getMarginLine(start[0], margin_path)
+    margin_point_index_2 = getMarginLine(start[1], margin_path)
+    margin_point1 = converIndexToNavs(margin_point_index_1, pos)
+    margin_point2 = converIndexToNavs(margin_point_index_2, pos)
+    print("MARGIN POINT 1: ", margin_point_index_1)
+    print("------------------------------------------------------------")
+    print("MARGIN POINT 2: ", margin_point_index_2)
+    print("------------------------------------------------------------")
     return margin_point1, margin_point2
 
 
@@ -219,6 +237,6 @@ def side(d, list_points):
 
 
 margin_path = draw_margin(path, margin, pos)
+print("MARGIN PATH: ", margin_path)
+print("------------------------------------------------------------")
 margin_point1, margin_point2 = getMarginPoint(margin, margin_path)
-print(margin_point1)
-print(margin_point2)

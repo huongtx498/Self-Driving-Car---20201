@@ -52,10 +52,14 @@ class Map(pygame.sprite.Sprite):
         print("MARGIN: ", margin)
         print("------------------------------------------------------------")
         margin_path = draw_margin(listPoint, margin, pos)
-        print(print("MARGIN PATH: ", margin_path))
+        print("MARGIN PATH: ", margin_path)
         print("------------------------------------------------------------")
 
         margin_point1, margin_point2 = getMarginPoint(margin, margin_path)
+        print("MARGIN POINT 1: ", margin_point1)
+        print("------------------------------------------------------------")
+        print("MARGIN POINT 2: ", margin_point2)
+        print("------------------------------------------------------------")
         pygame.draw.lines(self.image, blue, False, margin_point1, 5)
         pygame.draw.lines(self.image, blue, False, margin_point2, 5)
 
@@ -67,7 +71,7 @@ class Map(pygame.sprite.Sprite):
     def get_map_navs(self):
         with xlrd.open_workbook('../media/toa-do.xlsx') as book:
             # listP, dis = get_path(82, 37)
-            listP, dis = get_path(3, 17)
+            listP, dis = get_path(7, 38)
             sheet = book.sheet_by_index(0)
             for pointid in listP:
                 listPoint.append(pointid)
@@ -242,6 +246,9 @@ def is_intersected(A, B):
     dB = linear(B_0, B_1)
     x = intersect_point(dA, dB)
 
+    if x is None:
+        return False
+
     dist_a = dist_point_point(x, A_0) + dist_point_point(x, A_1)
     dist_b = dist_point_point(x, B_0) + dist_point_point(x, B_1)
 
@@ -290,17 +297,24 @@ def getMarginLine(startP, margin_Path):
     return lineP
 
 
-def getMarginPoint(margin, margin_path):
-    print("Get Margin Point: ", margin)
+def converIndexToNavs(listIndex, pos):
+    navs = []
+    for index in listIndex:
+        navs.append(pos[index])
+    return navs
 
+
+def getMarginPoint(margin, margin_path):
     listP = []
     for path in margin_path:
         for point in path:
             if checkStartEndPoint(point, margin_path):
                 listP.append(point)
     start = getStartPoint(listP, margin)
-    margin_point1 = getMarginLine(start[0], margin_path)
-    margin_point2 = getMarginLine(start[1], margin_path)
+    margin_point_index_1 = getMarginLine(start[0], margin_path)
+    margin_point_index_2 = getMarginLine(start[1], margin_path)
+    margin_point1 = converIndexToNavs(margin_point_index_1, pos)
+    margin_point2 = converIndexToNavs(margin_point_index_2, pos)
     return margin_point1, margin_point2
 
 
