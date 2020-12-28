@@ -13,7 +13,7 @@ from graphic.button import Button
 pygame.init()
 SIZE = (767, 557)
 screen = pygame.display.set_mode(SIZE)
-backg = pygame.image.load('../media/map2.png')
+backg = pygame.image.load('../media/map.png')
 screen.blit(backg, (0, 0))
 
 # draw button
@@ -71,8 +71,14 @@ while Running:
                 if 80 <= pygame.mouse.get_pos()[1] <= 120:
                     start_point = 0
                     end_point = 0
-                    print("start point", start_point)
-                    print("end point", end_point)
+                    print(
+                        "------------------------------------------------------------")
+                    print("START POINT:", start_point)
+                    print(
+                        "------------------------------------------------------------")
+                    print("END POINT:", end_point)
+                    print(
+                        "------------------------------------------------------------")
                     screen.blit(backg, (0, 0))
                     continueBtn.draw(screen, (0, 0, 0))
                     resetBtn.draw(screen, (0, 0, 0))
@@ -91,7 +97,13 @@ while Running:
                 # lay toa do diem dau-cuoi
                 if start_point == 0:
                     start_point = get_nearest(u)
-                    print("start point", start_point)
+                    print(
+                        "------------------------------------------------------------")
+                    print("START POINT:", start_point)
                 else:
                     end_point = get_nearest(u)
-                    print("end point", end_point)
+                    print(
+                        "------------------------------------------------------------")
+                    print("END POINT:", end_point)
+                    print(
+                        "------------------------------------------------------------")
