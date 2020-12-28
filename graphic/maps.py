@@ -381,18 +381,21 @@ def getStartPoint(listP, marginP):
 
 
 def getMarginLine(startP, margin_Path):
+    marginP = []
     lineP = []
+    for i in margin_Path:
+        marginP.append(i)
     previous = startP
     lineP.append(previous)
-    while checkStartEndPoint(previous, margin_Path):
-        for path in margin_Path:
+    while checkStartEndPoint(previous, marginP):
+        for path in marginP:
             if previous in path:
                 for point in path:
                     if point != previous:
                         previous = point
                         lineP.append(previous)
                         break
-                margin_Path.remove(path)
+                marginP.remove(path)
                 break
     return lineP
 

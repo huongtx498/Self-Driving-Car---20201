@@ -4,39 +4,37 @@ import itertools
 
 PI = math.pi
 
-pos = {
-    1: (164, 179),
-    20: (183, 230),
-    19: (201, 284),
-    2: (291, 147),
-    3: (357, 132),
-    21: (314, 182),
-    5: (321, 255),
-    4: (401, 212),
-    10: (471, 95),
-    12: (482, 38),
-    25: (521, 48),
-    13: (561, 32),
-    11: (549, 71),
-    22: (530, 119),
-    15: (494, 176),
-    16: (573, 165),
-}
+# pos = {
+#     1: (164, 179),
+#     20: (183, 230),
+#     19: (201, 284),
+#     2: (291, 147),
+#     3: (357, 132),
+#     21: (314, 182),
+#     5: (321, 255),
+#     4: (401, 212),
+#     10: (471, 95),
+#     12: (482, 38),
+#     25: (521, 48),
+#     13: (561, 32),
+#     11: (549, 71),
+#     22: (530, 119),
+#     15: (494, 176),
+#     16: (573, 165),
+# }
 
-margin = {20: [1, 19], 21: [2, 3, 4, 5], 22: [10, 11, 16, 15], 25: [12, 13]}
+# margin = {20: [1, 19], 21: [2, 3, 4, 5], 22: [10, 11, 16, 15], 25: [12, 13]}
 
-path = [20, 21, 22, 25]
+# path = [20, 21, 22, 25]
 
 
-# pos = {82: (3810, 3150), 172: (3810, 3102), 262: (3810, 3174), 83: (3492, 3054), 173: (3486, 3120), 263: (3492, 3036), 50: (3204, 2952),
-#        140: (3264, 2952), 230: (3222, 2994), 285: (3174, 2976), 313: (3198, 2928), 84: (3012, 2904), 174: (3024, 2868), 264: (3006, 2928),
-#        1: (2814, 2820), 91: (2844, 2814), 181: (2832, 2886), 271: (2784, 2874), 299: (2784, 2796), 44: (2766, 2652), 134: (2790, 2646),
-#        224: (2748, 2652), 45: (2700, 2418), 135: (2724, 2418), 225: (2682, 2436)}
+pos = {4: (2022, 2598), 94: (2064, 2568), 184: (2040, 2646), 272: (1986, 2628), 300: (2010, 2550), 18: (1848, 2538), 108: (1860, 2508), 198: (1824, 2574), 19: (
+    1602, 2460), 109: (1614, 2430), 199: (1566, 2496), 20: (1416, 2406), 110: (1458, 2376), 200: (1434, 2454), 277: (1380, 2436), 305: (1404, 2358)}
 
-# margin = {82: [172, 262], 83: [173, 263], 50: [140, 230, 285, 313], 84: [
-#     174, 264], 1: [91, 181, 271, 299], 44: [134, 224], 45: [135, 225]}
+margin = {4: [94, 184, 272, 300], 18: [108, 198],
+          19: [109, 199], 20: [110, 200, 277, 305]}
 
-# path = [82, 83, 50, 84, 1, 44, 45]
+path = [4, 18, 19, 20]
 
 margin_path = []
 left_margin_point = []
@@ -205,18 +203,21 @@ def getStartPoint(listP, marginP):
 
 
 def getMarginLine(startP, margin_Path):
+    marginP = []
     lineP = []
+    for i in margin_Path:
+        marginP.append(i)
     previous = startP
     lineP.append(previous)
-    while checkStartEndPoint(previous, margin_Path):
-        for path in margin_Path:
+    while checkStartEndPoint(previous, marginP):
+        for path in marginP:
             if previous in path:
                 for point in path:
                     if point != previous:
                         previous = point
                         lineP.append(previous)
                         break
-                margin_Path.remove(path)
+                marginP.remove(path)
                 break
     return lineP
 
@@ -358,28 +359,28 @@ def getInitProp(listPoint, pos):
 
 
 # [1,2,3], {1: [33,44], ...}
-def min_distance_den_1_tap_canh(tap_canh, listPoint, pos):
-    list_distance = []
-    tam_xe, alpha = getInitProp(listPoint, pos)
-    ptdt_qua_xe = get_ptdt_qua_xe(tam_xe, alpha)
-    for i in range(len(tap_canh) - 2):
-        toa_do_cur = tap_canh[i]
-        toan_do_next = tap_canh[i + 1]
-        ptdt = get_ptdt(toa_do_cur, toan_do_next)
-        giao_diem = get_giao_diem(ptdt, ptdt_qua_xe)
-        if giao_diem is not None:
-            list_distance.append(distance(tam_xe, giao_diem))
-        else:
-            list_distance.append(999999999)
-    return min(list_distance)
+# def min_distance_den_1_tap_canh(tap_canh, listPoint, pos):
+#     list_distance = []
+#     tam_xe, alpha = getInitProp(listPoint, pos)
+#     ptdt_qua_xe = get_ptdt_qua_xe(tam_xe, alpha)
+#     for i in range(len(tap_canh) - 2):
+#         toa_do_cur = tap_canh[i]
+#         toan_do_next = tap_canh[i + 1]
+#         ptdt = get_ptdt(toa_do_cur, toan_do_next)
+#         giao_diem = get_giao_diem(ptdt, ptdt_qua_xe)
+#         if giao_diem is not None:
+#             list_distance.append(distance(tam_xe, giao_diem))
+#         else:
+#             list_distance.append(999999999)
+#     return min(list_distance)
 
 
-def do_lech_trai(tap_canh_trai, tap_canh_phai, listPoint, pos):
-    distance_left = min_distance_den_1_tap_canh(tap_canh_trai, listPoint, pos)
-    distance_right = min_distance_den_1_tap_canh(tap_canh_phai, listPoint, pos)
-    print(distance_left, distance_right)
-    return distance_left / (distance_left + distance_right)
+# def do_lech_trai(tap_canh_trai, tap_canh_phai, listPoint, pos):
+#     distance_left = min_distance_den_1_tap_canh(tap_canh_trai, listPoint, pos)
+#     distance_right = min_distance_den_1_tap_canh(tap_canh_phai, listPoint, pos)
+#     print(distance_left, distance_right)
+#     return distance_left / (distance_left + distance_right)
 
 
-do_lech_trai_ = do_lech_trai(left_margin_point, right_margin_point, path, pos)
-print(do_lech_trai_)
+# do_lech_trai_ = do_lech_trai(left_margin_point, right_margin_point, path, pos)
+# print(do_lech_trai_)
