@@ -6,6 +6,7 @@ import numpy as np
 import itertools
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from graphic.loader import load_image
 from fuzzy_base.dijkstra import get_path
@@ -42,7 +43,8 @@ class Map(pygame.sprite.Sprite):
         self.rect_w = self.rect.size[0]
         self.rect_h = self.rect.size[1]
         self.image = pygame.transform.scale(
-            self.image, (int(self.rect_w * 6), int(self.rect_h * 6)))
+            self.image, (int(self.rect_w * 6), int(self.rect_h * 6))
+        )
         self.x = init_x
         self.y = init_y
         blue = 230, 30, 30
@@ -57,7 +59,8 @@ class Map(pygame.sprite.Sprite):
         print("------------------------------------------------------------")
 
         left_margin_point, right_margin_point = getMarginPoint(
-            margin, margin_path, listPoint, pos)
+            margin, margin_path, listPoint, pos
+        )
         print("LEFT MARGIN POINT: ", left_margin_point)
         print("------------------------------------------------------------")
         print("RIGHT MARGIN POINT: ", right_margin_point)
@@ -71,7 +74,7 @@ class Map(pygame.sprite.Sprite):
         self.rect.topleft = self.x - cam_x + 800, self.y - cam_y + 500
 
     def get_map_navs(self):
-        with xlrd.open_workbook('../media/toa-do.xlsx') as book:
+        with xlrd.open_workbook("../media/toa-do.xlsx") as book:
             # listP, dis = get_path(82, 37)
             listP, dis = get_path(get_pos.start_point, get_pos.end_point)
             sheet = book.sheet_by_index(0)
@@ -82,30 +85,47 @@ class Map(pygame.sprite.Sprite):
                     if row_value[0] == pointid:
                         # both center & margin point
                         pos[int(row_value[0])] = (
-                            int(row_value[1]) * 6, int(row_value[2]) * 6)
+                            int(row_value[1]) * 6,
+                            int(row_value[2]) * 6,
+                        )
                         pos[int(row_value[3])] = (
-                            int(row_value[4]) * 6, int(row_value[5]) * 6)
+                            int(row_value[4]) * 6,
+                            int(row_value[5]) * 6,
+                        )
                         pos[int(row_value[6])] = (
-                            int(row_value[7]) * 6, int(row_value[8]) * 6)
-                        if row_value[9] != '':
+                            int(row_value[7]) * 6,
+                            int(row_value[8]) * 6,
+                        )
+                        if row_value[9] != "":
                             pos[int(row_value[9])] = (
-                                int(row_value[10]) * 6, int(row_value[11]) * 6)
+                                int(row_value[10]) * 6,
+                                int(row_value[11]) * 6,
+                            )
                             pos[int(row_value[12])] = (
-                                int(row_value[13]) * 6, int(row_value[14]) * 6)
+                                int(row_value[13]) * 6,
+                                int(row_value[14]) * 6,
+                            )
 
                         # margin point
                         margin[int(row_value[0])] = [
-                            int(row_value[3]), int(row_value[6])]
-                        if row_value[9] != '':
+                            int(row_value[3]),
+                            int(row_value[6]),
+                        ]
+                        if row_value[9] != "":
                             margin[int(row_value[0])].extend(
-                                [int(row_value[9]), int(row_value[12])])
+                                [int(row_value[9]), int(row_value[12])]
+                            )
 
                         MAP_NAVS.append(
-                            (int(row_value[1]) * 6, int(row_value[2]) * 6, int(row_value[0])))
+                            (
+                                int(row_value[1]) * 6,
+                                int(row_value[2]) * 6,
+                                int(row_value[0]),
+                            )
+                        )
 
                         # center line point
-                        LINE_NAVS.append(
-                            (int(row_value[1]) * 6, int(row_value[2]) * 6))
+                        LINE_NAVS.append((int(row_value[1]) * 6, int(row_value[2]) * 6))
 
             sheet = book.sheet_by_index(1)
             i = 0.0
@@ -115,14 +135,71 @@ class Map(pygame.sprite.Sprite):
                     row_value = sheet.row_values(row_num)
                     if row_value[5] == pointid:
                         # TRAFFIC_LAMP_POS.append(int(row_value[5]))
-                        TRAFFIC_LAMP_POS.append(
-                            listPoint.index(int(row_value[5])))
+                        TRAFFIC_LAMP_POS.append(listPoint.index(int(row_value[5])))
                         TRAFFIC_LAMP_COORDINATES.append(
-                            (int(row_value[1]) * 6, int(row_value[2]) * 6, int(row_value[3]), i))
+                            (
+                                int(row_value[1]) * 6,
+                                int(row_value[2]) * 6,
+                                int(row_value[3]),
+                                i,
+                            )
+                        )
                         i = i + 1.0
                     j = j + 1
             print("TRAFFIC LAMP POS: ", TRAFFIC_LAMP_COORDINATES)
             print("------------------------------------------------------------")
+
+
+def he_so_goc(alpha):
+    return math.tan(alpha)
+
+
+def get_ptdt(P, Q):
+    # [1,2], [3,4] => ax + by = c
+    a = Q[1] - P[1]
+    b = P[0] - Q[0]
+    c = a * (P[0]) + b * (P[1])
+    return a, b, c
+
+
+def get_ptdt_qua_xe(pos, alpha):
+    # ptdt qua tam xa va tao voi truc Ox 1 goc
+    k = he_so_goc(alpha)
+    return k, -1, k * pos[0] - pos[1]  # ax + by = c
+
+
+def get_giao_diem(arr1, arr2):
+    # [4,3,32], [4,-2,12] => [x, y]
+    import numpy as np
+
+    a = np.array([[arr1[0], arr1[1]], [arr2[0], arr2[1]]])
+    b = np.array([arr1[2], arr2[2]])
+    try:
+        return np.linalg.solve(a, b)
+    except:
+        return None
+
+
+def distance(a, b):
+    return math.dist(a, b)
+
+
+def min_distance_den_1_tap_canh(
+    tap_canh, toa_do, listPoint, pos
+):  # [1,2,3], {1: [33,44], ...}
+    list_distance = []
+    tam_xe, alpha = getInitProp(listPoint, pos)
+    ptdt_qua_xe = get_ptdt_qua_xe(tam_xe, alpha)
+    for i in len(tap_canh) - 2:
+        toa_do_cur = toa_do[tap_canh[i]]
+        toan_do_next = toa_do[tap_canh[i + 1]]
+        ptdt = get_ptdt(toa_do_cur, toan_do_next)
+        giao_diem = get_giao_diem(ptdt, ptdt_qua_xe)
+        if giao_diem is not None:
+            list_distance.append(distance(tam_xe, giao_diem))
+        else:
+            list_distance.append(999999999)
+    return min(list_distance)
 
 
 def draw_margin(listPoint, margin, pos):
@@ -161,10 +238,12 @@ def draw_margin(listPoint, margin, pos):
         margin_n.extend(itertools.combinations(margin_1n, 2))
         margin_n.extend(itertools.combinations(margin_2n, 2))
 
-        margin_p_with_dist = [(item, dist_point_point(
-            pos[item[0]], pos[item[1]])) for item in margin_p]
-        margin_n_with_dist = [(item, dist_point_point(
-            pos[item[0]], pos[item[1]])) for item in margin_n]
+        margin_p_with_dist = [
+            (item, dist_point_point(pos[item[0]], pos[item[1]])) for item in margin_p
+        ]
+        margin_n_with_dist = [
+            (item, dist_point_point(pos[item[0]], pos[item[1]])) for item in margin_n
+        ]
 
         margin_p_with_dist.sort(key=lambda x: x[1])
         margin_n_with_dist.sort(key=lambda x: x[1])
@@ -173,15 +252,14 @@ def draw_margin(listPoint, margin, pos):
 
         num_point = len(margin_1p) + len(margin_2p)
         # print("num_point: {}".format(num_point))
-        able_draw_p = [item[0] for item in margin_p_with_dist[:num_point - 1]]
+        able_draw_p = [item[0] for item in margin_p_with_dist[: num_point - 1]]
         margin_path.extend(able_draw_p)
-        able_draw_n = [item[0] for item in margin_n_with_dist[:num_point - 1]]
+        able_draw_n = [item[0] for item in margin_n_with_dist[: num_point - 1]]
         margin_path.extend(able_draw_n)
 
         if len(margin[listPoint[i]]) == 4:
             for j in range(3):
-                able_draw = (margin[listPoint[i]][j],
-                             margin[listPoint[i]][j + 1])
+                able_draw = (margin[listPoint[i]][j], margin[listPoint[i]][j + 1])
                 B = [pos[able_draw[0]], pos[able_draw[1]]]
                 if is_intersected(A, B) == False:
                     margin_path.append(able_draw)
@@ -219,7 +297,9 @@ def linear(a, b):
 
 def dist_point_linear(a, B):
     pos_a = a
-    return abs(B[0] * pos_a[0] + B[1] * pos_a[1] + B[2]) / math.sqrt(B[0]**2 + B[1]**2)
+    return abs(B[0] * pos_a[0] + B[1] * pos_a[1] + B[2]) / math.sqrt(
+        B[0] ** 2 + B[1] ** 2
+    )
 
 
 def intersect_point(dA, dB):
@@ -235,7 +315,7 @@ def dist_point_point(a, b):
     pos_a = a
     pos_b = b
 
-    return math.sqrt((pos_a[0] - pos_b[0])**2 + (pos_a[1] - pos_b[1])**2)
+    return math.sqrt((pos_a[0] - pos_b[0]) ** 2 + (pos_a[1] - pos_b[1]) ** 2)
 
 
 def is_intersected(A, B):
@@ -255,7 +335,9 @@ def is_intersected(A, B):
     dist_b = dist_point_point(x, B_0) + dist_point_point(x, B_1)
 
     eps = 0.1
-    if (abs(dist_point_point(A_0, A_1) - dist_a) < eps) and (abs(dist_point_point(B_0, B_1) - dist_b) < eps):
+    if (abs(dist_point_point(A_0, A_1) - dist_a) < eps) and (
+        abs(dist_point_point(B_0, B_1) - dist_b) < eps
+    ):
         return True
     else:
         return False
@@ -344,6 +426,7 @@ def softLeftRight(list1, list2, path, margin, pos):
 
 # lấy ra tập điểm trái và phải của lề (trả về  theo thứ tự trái, phải)
 
+
 def getMarginPoint(margin, margin_path, path, pos):
     listP = []
     for subpath in margin_path:
@@ -354,7 +437,8 @@ def getMarginPoint(margin, margin_path, path, pos):
     margin_point_index_1 = getMarginLine(start[0], margin_path)
     margin_point_index_2 = getMarginLine(start[1], margin_path)
     left_point_index, right_point_index = softLeftRight(
-        margin_point_index_1, margin_point_index_2, path, margin, pos)
+        margin_point_index_1, margin_point_index_2, path, margin, pos
+    )
     left_margin_point = converIndexToNavs(left_point_index, pos)
     right_margin_point = converIndexToNavs(right_point_index, pos)
     print("MARGIN LEFT POINT: ", left_point_index)
@@ -365,6 +449,7 @@ def getMarginPoint(margin, margin_path, path, pos):
 
 
 # lấy ra điểm xuất phát và góc ban đầu của xe (hợp với trục Ox)
+
 
 def getInitProp(listPoint, pos):
     a = listPoint[0]
