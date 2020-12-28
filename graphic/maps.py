@@ -165,9 +165,13 @@ def get_ptdt(P, Q):
 
 
 def get_ptdt_qua_xe(pos, alpha):
-    # ptdt qua tam xa va tao voi truc Ox 1 goc
     k = he_so_goc(alpha)
-    return k, -1, k * pos[0] - pos[1]  # ax + by = c
+    a, b, c = (
+        k,
+        -1,
+        k * pos[0] - pos[1],
+    )  # ax + by = c, ptdt qua tam xa va tao voi truc Ox 1 goc
+    return -b, a, -(-b * pos[0] + a * pos[1])
 
 
 def get_giao_diem(arr1, arr2):
@@ -186,15 +190,13 @@ def distance(a, b):
     return math.dist(a, b)
 
 
-def min_distance_den_1_tap_canh(
-    tap_canh, toa_do, listPoint, pos
-):  # [1,2,3], {1: [33,44], ...}
+def min_distance_den_1_tap_canh(tap_canh, listPoint, pos):  # [1,2,3], {1: [33,44], ...}
     list_distance = []
     tam_xe, alpha = getInitProp(listPoint, pos)
     ptdt_qua_xe = get_ptdt_qua_xe(tam_xe, alpha)
-    for i in len(tap_canh) - 2:
-        toa_do_cur = toa_do[tap_canh[i]]
-        toan_do_next = toa_do[tap_canh[i + 1]]
+    for i in range(len(tap_canh) - 2):
+        toa_do_cur = tap_canh[i]
+        toan_do_next = tap_canh[i + 1]
         ptdt = get_ptdt(toa_do_cur, toan_do_next)
         giao_diem = get_giao_diem(ptdt, ptdt_qua_xe)
         if giao_diem is not None:
@@ -204,11 +206,11 @@ def min_distance_den_1_tap_canh(
     return min(list_distance)
 
 
-def do_lech_trai(tap_canh_trai, tap_canh_phai, toa_do, listPoint, pos):
-    distance_left = min_distance_den_1_tap_canh(tap_canh_trai, toa_do, listPoint, pos)
-    distance_right = min_distance_den_1_tap_canh(tap_canh_phai, toa_do, listPoint, pos)
-    return distance_left / (distance_left = distance_right)
-    
+def do_lech_trai(tap_canh_trai, tap_canh_phai, listPoint, pos):
+    distance_left = min_distance_den_1_tap_canh(tap_canh_trai, listPoint, pos)
+    distance_right = min_distance_den_1_tap_canh(tap_canh_phai, listPoint, pos)
+    return distance_left / (distance_left + distance_right)
+
 
 def draw_margin(listPoint, margin, pos):
     margin_path = []

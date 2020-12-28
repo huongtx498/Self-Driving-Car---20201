@@ -2,8 +2,24 @@ import math
 import numpy as np
 import itertools
 
-pos = {1: (164, 179), 20: (183, 230), 19: (201, 284), 2: (291, 147), 3: (357, 132), 21: (314, 182), 5: (321, 255), 4: (401, 212),
-       10: (471, 95), 12: (482, 38), 25: (521, 48), 13: (561, 32), 11: (549, 71), 22: (530, 119), 15: (494, 176), 16: (573, 165)}
+pos = {
+    1: (164, 179),
+    20: (183, 230),
+    19: (201, 284),
+    2: (291, 147),
+    3: (357, 132),
+    21: (314, 182),
+    5: (321, 255),
+    4: (401, 212),
+    10: (471, 95),
+    12: (482, 38),
+    25: (521, 48),
+    13: (561, 32),
+    11: (549, 71),
+    22: (530, 119),
+    15: (494, 176),
+    16: (573, 165),
+}
 
 margin = {20: [1, 19], 21: [2, 3, 4, 5], 22: [10, 11, 16, 15], 25: [12, 13]}
 
@@ -61,10 +77,12 @@ def draw_margin(path, margin, pos):
         margin_n.extend(itertools.combinations(margin_1n, 2))
         margin_n.extend(itertools.combinations(margin_2n, 2))
 
-        margin_p_with_dist = [(item, dist_point_point(
-            pos[item[0]], pos[item[1]])) for item in margin_p]
-        margin_n_with_dist = [(item, dist_point_point(
-            pos[item[0]], pos[item[1]])) for item in margin_n]
+        margin_p_with_dist = [
+            (item, dist_point_point(pos[item[0]], pos[item[1]])) for item in margin_p
+        ]
+        margin_n_with_dist = [
+            (item, dist_point_point(pos[item[0]], pos[item[1]])) for item in margin_n
+        ]
 
         margin_p_with_dist.sort(key=lambda x: x[1])
         margin_n_with_dist.sort(key=lambda x: x[1])
@@ -73,9 +91,9 @@ def draw_margin(path, margin, pos):
 
         num_point = len(margin_1p) + len(margin_2p)
         # print("num_point: {}".format(num_point))
-        able_draw_p = [item[0] for item in margin_p_with_dist[:num_point - 1]]
+        able_draw_p = [item[0] for item in margin_p_with_dist[: num_point - 1]]
         margin_path.extend(able_draw_p)
-        able_draw_n = [item[0] for item in margin_n_with_dist[:num_point - 1]]
+        able_draw_n = [item[0] for item in margin_n_with_dist[: num_point - 1]]
         margin_path.extend(able_draw_n)
 
         if len(margin[path[i]]) == 4:
@@ -118,7 +136,9 @@ def linear(a, b):
 
 def dist_point_linear(a, B):
     pos_a = a
-    return abs(B[0] * pos_a[0] + B[1] * pos_a[1] + B[2]) / math.sqrt(B[0]**2 + B[1]**2)
+    return abs(B[0] * pos_a[0] + B[1] * pos_a[1] + B[2]) / math.sqrt(
+        B[0] ** 2 + B[1] ** 2
+    )
 
 
 def intersect_point(dA, dB):
@@ -133,7 +153,7 @@ def intersect_point(dA, dB):
 def dist_point_point(a, b):
     pos_a = a
     pos_b = b
-    return math.sqrt((pos_a[0] - pos_b[0])**2 + (pos_a[1] - pos_b[1])**2)
+    return math.sqrt((pos_a[0] - pos_b[0]) ** 2 + (pos_a[1] - pos_b[1]) ** 2)
 
 
 def is_intersected(A, B):
@@ -153,7 +173,9 @@ def is_intersected(A, B):
     dist_b = dist_point_point(x, B_0) + dist_point_point(x, B_1)
 
     eps = 0.1
-    if (abs(dist_point_point(A_0, A_1) - dist_a) < eps) and (abs(dist_point_point(B_0, B_1) - dist_b) < eps):
+    if (abs(dist_point_point(A_0, A_1) - dist_a) < eps) and (
+        abs(dist_point_point(B_0, B_1) - dist_b) < eps
+    ):
         return True
     else:
         return False
@@ -252,7 +274,8 @@ def getMarginPoint(margin, margin_path, path, pos):
     margin_point_index_1 = getMarginLine(start[0], margin_path)
     margin_point_index_2 = getMarginLine(start[1], margin_path)
     left_point_index, right_point_index = softLeftRight(
-        margin_point_index_1, margin_point_index_2, path, margin, pos)
+        margin_point_index_1, margin_point_index_2, path, margin, pos
+    )
     left_margin_point = converIndexToNavs(left_point_index, pos)
     right_margin_point = converIndexToNavs(right_point_index, pos)
     print("MARGIN LEFT POINT: ", left_point_index)
@@ -279,5 +302,76 @@ def side(d, list_points):
 margin_path = draw_margin(path, margin, pos)
 print("MARGIN PATH: ", margin_path)
 print("------------------------------------------------------------")
-left_margin_point, right_margin_point = getMarginPoint(
-    margin, margin_path, path, pos)
+left_margin_point, right_margin_point = getMarginPoint(margin, margin_path, path, pos)
+
+
+def he_so_goc(alpha):
+    return math.tan(alpha)
+
+
+def get_ptdt(P, Q):
+    # [1,2], [3,4] => ax + by = c
+    a = Q[1] - P[1]
+    b = P[0] - Q[0]
+    c = a * (P[0]) + b * (P[1])
+    return a, b, c
+
+
+def get_ptdt_qua_xe(pos, alpha):
+    k = he_so_goc(alpha)
+    a, b, c = (
+        k,
+        -1,
+        k * pos[0] - pos[1],
+    )  # ax + by = c, ptdt qua tam xa va tao voi truc Ox 1 goc
+    return -b, a, -(-b * pos[0] + a * pos[1])
+
+
+def get_giao_diem(arr1, arr2):
+    # [4,3,32], [4,-2,12] => [x, y]
+    import numpy as np
+
+    a = np.array([[arr1[0], arr1[1]], [arr2[0], arr2[1]]])
+    b = np.array([arr1[2], arr2[2]])
+    try:
+        return np.linalg.solve(a, b)
+    except:
+        return None
+
+
+def distance(a, b):
+    return math.dist(a, b)
+
+
+def getInitProp(listPoint, pos):
+    a = listPoint[0]
+    b = listPoint[1]
+    alpha = math.atan2(pos[b][1] - pos[a][1], pos[b][0] - pos[a][0])
+    return pos[a], alpha
+
+
+def min_distance_den_1_tap_canh(tap_canh, listPoint, pos):  # [1,2,3], {1: [33,44], ...}
+    list_distance = []
+    tam_xe, alpha = getInitProp(listPoint, pos)
+    ptdt_qua_xe = get_ptdt_qua_xe(tam_xe, alpha)
+    for i in range(len(tap_canh) - 2):
+        toa_do_cur = tap_canh[i]
+        toan_do_next = tap_canh[i + 1]
+        ptdt = get_ptdt(toa_do_cur, toan_do_next)
+        giao_diem = get_giao_diem(ptdt, ptdt_qua_xe)
+        if giao_diem is not None:
+            list_distance.append(distance(tam_xe, giao_diem))
+        else:
+            list_distance.append(999999999)
+    return min(list_distance)
+
+
+def do_lech_trai(tap_canh_trai, tap_canh_phai, listPoint, pos):
+    distance_left = min_distance_den_1_tap_canh(tap_canh_trai, listPoint, pos)
+    distance_right = min_distance_den_1_tap_canh(tap_canh_phai, listPoint, pos)
+    print(distance_left, distance_right)
+    return distance_left / (distance_left + distance_right)
+
+
+do_lech_trai_ = do_lech_trai(left_margin_point, right_margin_point, path, pos)
+print(do_lech_trai_)
