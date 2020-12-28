@@ -2,6 +2,8 @@ import math
 import numpy as np
 import itertools
 
+PI = math.pi
+
 pos = {
     1: (164, 179),
     20: (183, 230),
@@ -259,9 +261,16 @@ def softLeftRight(list1, list2, path, margin, pos):
     t_c = math.atan2(target[1] - current[1], target[0] - current[0])
     a_c = math.atan2(a[1] - current[1], a[0] - current[0])
     b_c = math.atan2(b[1] - current[1], b[0] - current[0])
-    if a_c > b_c:
-        return list1, list2
-    return list2, list1
+    if a_c * b_c < 0 & (t_c > PI / 2 or t_c < -PI / 2):
+        if a_c > b_c:
+            return list2, list1
+        else:
+            return list1, list2
+    else:
+        if a_c > b_c:
+            return list1, list2
+        else:
+            return list2, list1
 
 
 def getMarginPoint(margin, margin_path, path, pos):
@@ -302,7 +311,8 @@ def side(d, list_points):
 margin_path = draw_margin(path, margin, pos)
 print("MARGIN PATH: ", margin_path)
 print("------------------------------------------------------------")
-left_margin_point, right_margin_point = getMarginPoint(margin, margin_path, path, pos)
+left_margin_point, right_margin_point = getMarginPoint(
+    margin, margin_path, path, pos)
 
 
 def he_so_goc(alpha):
@@ -350,7 +360,8 @@ def getInitProp(listPoint, pos):
     return pos[a], alpha
 
 
-def min_distance_den_1_tap_canh(tap_canh, listPoint, pos):  # [1,2,3], {1: [33,44], ...}
+# [1,2,3], {1: [33,44], ...}
+def min_distance_den_1_tap_canh(tap_canh, listPoint, pos):
     list_distance = []
     tam_xe, alpha = getInitProp(listPoint, pos)
     ptdt_qua_xe = get_ptdt_qua_xe(tam_xe, alpha)
