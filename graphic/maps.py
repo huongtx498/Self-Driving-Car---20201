@@ -1,15 +1,17 @@
+import itertools
+import math
+import os
+import sys
+
+import numpy as np
 import pygame
 import xlrd
 from fuzzy_base import get_pos
-import math
-import numpy as np
-import itertools
-import sys
-import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-from graphic.loader import load_image
 from fuzzy_base.dijkstra import get_path
+
+from graphic.loader import load_image
 
 # Map filenames.
 MAP_NAVS = []  # mảng tọa độ (x, y) của các điểm trung tâm
@@ -201,6 +203,12 @@ def min_distance_den_1_tap_canh(
             list_distance.append(999999999)
     return min(list_distance)
 
+
+def do_lech_trai(tap_canh_trai, tap_canh_phai, toa_do, listPoint, pos):
+    distance_left = min_distance_den_1_tap_canh(tap_canh_trai, toa_do, listPoint, pos)
+    distance_right = min_distance_den_1_tap_canh(tap_canh_phai, toa_do, listPoint, pos)
+    return distance_left / (distance_left = distance_right)
+    
 
 def draw_margin(listPoint, margin, pos):
     margin_path = []
