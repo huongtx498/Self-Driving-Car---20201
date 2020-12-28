@@ -2,27 +2,27 @@ import math
 import numpy as np
 import itertools
 
-# pos = {1: (164, 179), 20: (183, 230), 19: (201, 284), 2: (291, 147), 3: (357, 132), 21: (314, 182), 5: (321, 255), 4: (401, 212),
-#        10: (471, 95), 12: (482, 38), 25: (521, 48), 13: (561, 32), 11: (549, 71), 22: (530, 119), 15: (494, 176), 16: (573, 165)}
+pos = {1: (164, 179), 20: (183, 230), 19: (201, 284), 2: (291, 147), 3: (357, 132), 21: (314, 182), 5: (321, 255), 4: (401, 212),
+       10: (471, 95), 12: (482, 38), 25: (521, 48), 13: (561, 32), 11: (549, 71), 22: (530, 119), 15: (494, 176), 16: (573, 165)}
 
-# margin = {20: [1, 19], 21: [2, 3, 4, 5], 22: [10, 11, 16, 15], 25: [12, 13]}
+margin = {20: [1, 19], 21: [2, 3, 4, 5], 22: [10, 11, 16, 15], 25: [12, 13]}
 
-# path = [20, 21, 22, 25]
+path = [20, 21, 22, 25]
 
 
-pos = {82: (3810, 3150), 172: (3810, 3102), 262: (3810, 3174), 83: (3492, 3054), 173: (3486, 3120), 263: (3492, 3036), 50: (3204, 2952),
-       140: (3264, 2952), 230: (3222, 2994), 285: (3174, 2976), 313: (3198, 2928), 84: (3012, 2904), 174: (3024, 2868), 264: (3006, 2928),
-       1: (2814, 2820), 91: (2844, 2814), 181: (2832, 2886), 271: (2784, 2874), 299: (2784, 2796), 44: (2766, 2652), 134: (2790, 2646),
-       224: (2748, 2652), 45: (2700, 2418), 135: (2724, 2418), 225: (2682, 2436)}
+# pos = {82: (3810, 3150), 172: (3810, 3102), 262: (3810, 3174), 83: (3492, 3054), 173: (3486, 3120), 263: (3492, 3036), 50: (3204, 2952),
+#        140: (3264, 2952), 230: (3222, 2994), 285: (3174, 2976), 313: (3198, 2928), 84: (3012, 2904), 174: (3024, 2868), 264: (3006, 2928),
+#        1: (2814, 2820), 91: (2844, 2814), 181: (2832, 2886), 271: (2784, 2874), 299: (2784, 2796), 44: (2766, 2652), 134: (2790, 2646),
+#        224: (2748, 2652), 45: (2700, 2418), 135: (2724, 2418), 225: (2682, 2436)}
 
-margin = {82: [172, 262], 83: [173, 263], 50: [140, 230, 285, 313], 84: [
-    174, 264], 1: [91, 181, 271, 299], 44: [134, 224], 45: [135, 225]}
+# margin = {82: [172, 262], 83: [173, 263], 50: [140, 230, 285, 313], 84: [
+#     174, 264], 1: [91, 181, 271, 299], 44: [134, 224], 45: [135, 225]}
 
-path = [82, 83, 50, 84, 1, 44, 45]
+# path = [82, 83, 50, 84, 1, 44, 45]
 
 margin_path = []
-margin_point1 = []
-margin_point2 = []
+left_margin_point = []
+right_margin_point = []
 
 
 def draw_margin(path, margin, pos):
@@ -204,22 +204,62 @@ def converIndexToNavs(listIndex, pos):
     return navs
 
 
-def getMarginPoint(margin, margin_path):
+def check4ways(index, margin):
+    if len(margin[index]) > 2:
+        return True
+    return False
+
+
+def softLeftRight(list1, list2, path, margin, pos):
+    a = b = (0, 0)
+    current_index = path[0]
+    target_index = path[1]
+
+    next_ = None
+    l = len(path)
+    for index, obj in enumerate(path):
+        if index < len(path) - 1:
+            next_ = path[index + 1]
+            if not check4ways(next_, margin):
+                current_index = obj
+                target_index = next_
+                break
+
+    current = pos[current_index]
+    target = pos[target_index]
+
+    if margin[target_index][0] in list1:
+        a = pos[margin[target_index][0]]
+        b = pos[margin[target_index][1]]
+    else:
+        a = pos[margin[target_index][1]]
+        b = pos[margin[target_index][0]]
+    t_c = math.atan2(target[1] - current[1], target[0] - current[0])
+    a_c = math.atan2(a[1] - current[1], a[0] - current[0])
+    b_c = math.atan2(b[1] - current[1], b[0] - current[0])
+    if a_c > b_c:
+        return list1, list2
+    return list2, list1
+
+
+def getMarginPoint(margin, margin_path, path, pos):
     listP = []
-    for path in margin_path:
-        for point in path:
+    for subpath in margin_path:
+        for point in subpath:
             if checkStartEndPoint(point, margin_path):
                 listP.append(point)
     start = getStartPoint(listP, margin)
     margin_point_index_1 = getMarginLine(start[0], margin_path)
     margin_point_index_2 = getMarginLine(start[1], margin_path)
-    margin_point1 = converIndexToNavs(margin_point_index_1, pos)
-    margin_point2 = converIndexToNavs(margin_point_index_2, pos)
-    print("MARGIN POINT 1: ", margin_point_index_1)
+    left_point_index, right_point_index = softLeftRight(
+        margin_point_index_1, margin_point_index_2, path, margin, pos)
+    left_margin_point = converIndexToNavs(left_point_index, pos)
+    right_margin_point = converIndexToNavs(right_point_index, pos)
+    print("MARGIN LEFT POINT: ", left_point_index)
     print("------------------------------------------------------------")
-    print("MARGIN POINT 2: ", margin_point_index_2)
+    print("MARGIN RIGHT POINT: ", right_point_index)
     print("------------------------------------------------------------")
-    return margin_point1, margin_point2
+    return left_margin_point, right_margin_point
 
 
 def side(d, list_points):
@@ -239,4 +279,5 @@ def side(d, list_points):
 margin_path = draw_margin(path, margin, pos)
 print("MARGIN PATH: ", margin_path)
 print("------------------------------------------------------------")
-margin_point1, margin_point2 = getMarginPoint(margin, margin_path)
+left_margin_point, right_margin_point = getMarginPoint(
+    margin, margin_path, path, pos)

@@ -1,5 +1,6 @@
 import pygame
 import xlrd
+from fuzzy_base import get_pos
 import math
 import numpy as np
 import itertools
@@ -25,8 +26,8 @@ margin = dict()
 listPoint = []
 
 margin_path = []
-margin_point1 = []
-margin_point2 = []
+left_margin_point = []
+right_margin_point = []
 
 
 class Map(pygame.sprite.Sprite):
@@ -55,13 +56,14 @@ class Map(pygame.sprite.Sprite):
         print("MARGIN PATH: ", margin_path)
         print("------------------------------------------------------------")
 
-        margin_point1, margin_point2 = getMarginPoint(margin, margin_path)
-        print("MARGIN POINT 1: ", margin_point1)
+        left_margin_point, right_margin_point = getMarginPoint(
+            margin, margin_path, listPoint, pos)
+        print("LEFT MARGIN POINT: ", left_margin_point)
         print("------------------------------------------------------------")
-        print("MARGIN POINT 2: ", margin_point2)
+        print("RIGHT MARGIN POINT: ", right_margin_point)
         print("------------------------------------------------------------")
-        pygame.draw.lines(self.image, blue, False, margin_point1, 5)
-        pygame.draw.lines(self.image, blue, False, margin_point2, 5)
+        pygame.draw.lines(self.image, blue, False, left_margin_point, 5)
+        pygame.draw.lines(self.image, blue, False, right_margin_point, 5)
 
     # Realign the map
 
@@ -71,7 +73,7 @@ class Map(pygame.sprite.Sprite):
     def get_map_navs(self):
         with xlrd.open_workbook('../media/toa-do.xlsx') as book:
             # listP, dis = get_path(82, 37)
-            listP, dis = get_path(7, 38)
+            listP, dis = get_path(get_pos.start_point, get_pos.end_point)
             sheet = book.sheet_by_index(0)
             for pointid in listP:
                 listPoint.append(pointid)
@@ -304,18 +306,71 @@ def converIndexToNavs(listIndex, pos):
     return navs
 
 
-def getMarginPoint(margin, margin_path):
+def check4ways(index, margin):
+    if len(margin[index]) > 2:
+        return True
+    return False
+
+
+def softLeftRight(list1, list2, path, margin, pos):
+    a = b = (0, 0)
+    current_index = path[0]
+    target_index = path[1]
+    next_ = None
+    l = len(path)
+    for index, obj in enumerate(path):
+        if index < len(path) - 1:
+            next_ = path[index + 1]
+            if not check4ways(next_, margin):
+                current_index = obj
+                target_index = next_
+                break
+
+    current = pos[current_index]
+    target = pos[target_index]
+
+    if margin[target_index][0] in list1:
+        a = pos[margin[target_index][0]]
+        b = pos[margin[target_index][1]]
+    else:
+        a = pos[margin[target_index][1]]
+        b = pos[margin[target_index][0]]
+    a_c = math.atan2(a[1] - current[1], a[0] - current[0])
+    b_c = math.atan2(b[1] - current[1], b[0] - current[0])
+    if a_c > b_c:
+        return list1, list2
+    return list2, list1
+
+
+# lấy ra tập điểm trái và phải của lề (trả về  theo thứ tự trái, phải)
+
+def getMarginPoint(margin, margin_path, path, pos):
     listP = []
-    for path in margin_path:
-        for point in path:
+    for subpath in margin_path:
+        for point in subpath:
             if checkStartEndPoint(point, margin_path):
                 listP.append(point)
     start = getStartPoint(listP, margin)
     margin_point_index_1 = getMarginLine(start[0], margin_path)
     margin_point_index_2 = getMarginLine(start[1], margin_path)
-    margin_point1 = converIndexToNavs(margin_point_index_1, pos)
-    margin_point2 = converIndexToNavs(margin_point_index_2, pos)
-    return margin_point1, margin_point2
+    left_point_index, right_point_index = softLeftRight(
+        margin_point_index_1, margin_point_index_2, path, margin, pos)
+    left_margin_point = converIndexToNavs(left_point_index, pos)
+    right_margin_point = converIndexToNavs(right_point_index, pos)
+    print("MARGIN LEFT POINT: ", left_point_index)
+    print("------------------------------------------------------------")
+    print("MARGIN RIGHT POINT: ", right_point_index)
+    print("------------------------------------------------------------")
+    return left_margin_point, right_margin_point
+
+
+# lấy ra điểm xuất phát và góc ban đầu của xe (hợp với trục Ox)
+
+def getInitProp(listPoint, pos):
+    a = listPoint[0]
+    b = listPoint[1]
+    alpha = math.atan2(pos[b][1] - pos[a][1], pos[b][0] - pos[a][0])
+    return pos[a], alpha
 
 
 def side(d, list_points):

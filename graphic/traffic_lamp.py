@@ -117,7 +117,7 @@ class TrafficLamp(pygame.sprite.Sprite):
     def render(self, screen):
         lamp_font = pygame.font.SysFont(None, 25)
         # render text
-        label = lamp_font.render(str(int(self.remaining_time / 60)), 1, (255, 255, 255))
+        label = lamp_font.render(str(int(self.remaining_time / 60)), 1, (0, 0, 0))
         screen.blit(label, (self.rect.center[0] + 30, self.rect.center[1]))
 
         return int(self.remaining_time / 60), self.status, self.numberical_order
