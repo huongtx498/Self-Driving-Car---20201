@@ -261,16 +261,13 @@ def softLeftRight(list1, list2, path, margin, pos):
     t_c = math.atan2(target[1] - current[1], target[0] - current[0])
     a_c = math.atan2(a[1] - current[1], a[0] - current[0])
     b_c = math.atan2(b[1] - current[1], b[0] - current[0])
-    if a_c * b_c < 0 & (t_c > PI / 2 or t_c < -PI / 2):
+    if a_c * b_c < 0 and (t_c > PI / 2 or t_c < -PI / 2):
         if a_c > b_c:
             return list2, list1
-        else:
-            return list1, list2
-    else:
-        if a_c > b_c:
-            return list1, list2
-        else:
-            return list2, list1
+        return list1, list2
+    if a_c > b_c:
+        return list1, list2
+    return list2, list1
 
 
 def getMarginPoint(margin, margin_path, path, pos):

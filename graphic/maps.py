@@ -13,6 +13,8 @@ from fuzzy_base.dijkstra import get_path
 
 from graphic.loader import load_image
 
+PI = math.pi
+
 # Map filenames.
 MAP_NAVS = []  # mảng tọa độ (x, y) của các điểm trung tâm
 LINE_NAVS = []
@@ -127,7 +129,8 @@ class Map(pygame.sprite.Sprite):
                         )
 
                         # center line point
-                        LINE_NAVS.append((int(row_value[1]) * 6, int(row_value[2]) * 6))
+                        LINE_NAVS.append(
+                            (int(row_value[1]) * 6, int(row_value[2]) * 6))
 
             sheet = book.sheet_by_index(1)
             i = 0.0
@@ -137,7 +140,8 @@ class Map(pygame.sprite.Sprite):
                     row_value = sheet.row_values(row_num)
                     if row_value[5] == pointid:
                         # TRAFFIC_LAMP_POS.append(int(row_value[5]))
-                        TRAFFIC_LAMP_POS.append(listPoint.index(int(row_value[5])))
+                        TRAFFIC_LAMP_POS.append(
+                            listPoint.index(int(row_value[5])))
                         TRAFFIC_LAMP_COORDINATES.append(
                             (
                                 int(row_value[1]) * 6,
@@ -190,7 +194,8 @@ def distance(a, b):
     return math.dist(a, b)
 
 
-def min_distance_den_1_tap_canh(tap_canh, listPoint, pos):  # [1,2,3], {1: [33,44], ...}
+# [1,2,3], {1: [33,44], ...}
+def min_distance_den_1_tap_canh(tap_canh, listPoint, pos):
     list_distance = []
     tam_xe, alpha = getInitProp(listPoint, pos)
     ptdt_qua_xe = get_ptdt_qua_xe(tam_xe, alpha)
@@ -269,7 +274,8 @@ def draw_margin(listPoint, margin, pos):
 
         if len(margin[listPoint[i]]) == 4:
             for j in range(3):
-                able_draw = (margin[listPoint[i]][j], margin[listPoint[i]][j + 1])
+                able_draw = (margin[listPoint[i]][j],
+                             margin[listPoint[i]][j + 1])
                 B = [pos[able_draw[0]], pos[able_draw[1]]]
                 if is_intersected(A, B) == False:
                     margin_path.append(able_draw)
@@ -427,8 +433,13 @@ def softLeftRight(list1, list2, path, margin, pos):
     else:
         a = pos[margin[target_index][1]]
         b = pos[margin[target_index][0]]
+    t_c = math.atan2(target[1] - current[1], target[0] - current[0])
     a_c = math.atan2(a[1] - current[1], a[0] - current[0])
     b_c = math.atan2(b[1] - current[1], b[0] - current[0])
+    if a_c * b_c < 0 and (t_c > PI / 2 or t_c < -PI / 2):
+        if a_c > b_c:
+            return list2, list1
+        return list1, list2
     if a_c > b_c:
         return list1, list2
     return list2, list1
