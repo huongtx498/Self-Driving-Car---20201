@@ -371,7 +371,6 @@ class Map(pygame.sprite.Sprite):
         return self.left_dist
 
     def draw_margin(self):
-        self.margin_path = []
         cent_lines = []
         for i in range(len(self.listPoint) - 1):
             # print("check {} - {}".format(self.listPoint[i], self.listPoint[i + 1]))
@@ -452,8 +451,8 @@ class Map(pygame.sprite.Sprite):
                 # print("is_intersected: {}". format(flag))
                 # print(margin_line)
                 self.margin_path.remove(margin_line)
-
-        return list(set(self.margin_path))
+        self.margin_path = list(set(self.margin_path))
+        return list(self.margin_path)
 
     def softLeftRight(self, list1, list2):
         a = b = (0, 0)

@@ -27,17 +27,15 @@ PI = math.pi
 
 # path = [20, 21, 22, 25]
 
+pos = {34: (1380, 1518), 124: (1398, 1494), 214: (1362, 1542), 33: (1674, 1608), 123: (1704, 1590), 213: (
+    1662, 1578), 281: (1644, 1626), 309: (1692, 1644), 69: (1578, 1932), 159: (1596, 1938), 249: (1554, 1926)}
+path = [34, 33, 69]
+margin = {34: [124, 214], 33: [123, 213, 281, 309], 69: [159, 249]}
+path_result: [(124, 213), (214, 281), (123, 213), (123, 309),
+              (309, 159), (281, 249), (123, 213)]
+# ID ĐIỂM LỀ TRÁI:  [124, 213]
+# ID ĐIỂM LỀ PHẢI:  [214, 281, 249]
 
-pos = {3: (2328, 2688), 93: (2358, 2664), 183: (2328, 2736), 2: (2538, 2748), 92: (2592, 2742), 182: (2556, 2808), 1: (2814, 2820), 91: (2844, 2814), 181: (2832, 2886), 271: (2784, 2874), 299: (2784, 2796), 84: (3012, 2904), 174: (3024, 2868), 264: (3006, 2928), 50: (3204, 2952), 140: (3264, 2952), 230: (3222, 2994), 285: (3174, 2976), 313: (
-    3198, 2928), 83: (3492, 3054), 173: (3486, 3120), 263: (3492, 3036), 82: (3810, 3150), 172: (3810, 3102), 262: (3810, 3174), 81: (4164, 3078), 171: (4134, 3066), 261: (4224, 3108), 80: (4092, 2358), 170: (4050, 2358), 260: (4080, 2358), 79: (4050, 1968), 169: (4020, 1968), 259: (4080, 1968), 78: (3858, 1374), 168: (3888, 1374), 258: (3828, 1374)}
-
-margin = {3: [93, 183], 2: [92, 182], 1: [91, 181, 271, 299], 84: [174, 264], 50: [140, 230, 285, 313], 83: [
-    173, 263], 82: [172, 262], 81: [171, 261], 80: [170, 260], 79: [169, 259], 78: [168, 258]}
-
-path = [3, 2, 1, 84, 50, 83, 82, 81, 80, 79, 78]
-
-test = [(259, 168), (174, 313), (92, 299), (170, 169), (262, 261), (182, 271), (173, 262), (93, 92), (264, 285), (169, 258), (91, 174),
-        (91, 299), (170, 260), (140, 313), (172, 171), (230, 173), (181, 271), (171, 260), (181, 264), (230, 285), (140, 263), (263, 172), (183, 182)]
 margin_path = []
 left_margin_point = []
 right_margin_point = []
@@ -358,31 +356,3 @@ def getInitProp(listPoint, pos):
     b = listPoint[1]
     alpha = math.atan2(pos[b][1] - pos[a][1], pos[b][0] - pos[a][0])
     return pos[a], alpha
-
-
-# [1,2,3], {1: [33,44], ...}
-# def min_distance_den_1_tap_canh(tap_canh, listPoint, pos):
-#     list_distance = []
-#     tam_xe, alpha = getInitProp(listPoint, pos)
-#     ptdt_qua_xe = get_ptdt_qua_xe(tam_xe, alpha)
-#     for i in range(len(tap_canh) - 2):
-#         toa_do_cur = tap_canh[i]
-#         toan_do_next = tap_canh[i + 1]
-#         ptdt = get_ptdt(toa_do_cur, toan_do_next)
-#         giao_diem = get_giao_diem(ptdt, ptdt_qua_xe)
-#         if giao_diem is not None:
-#             list_distance.append(distance(tam_xe, giao_diem))
-#         else:
-#             list_distance.append(999999999)
-#     return min(list_distance)
-
-
-# def do_lech_trai(tap_canh_trai, tap_canh_phai, listPoint, pos):
-#     distance_left = min_distance_den_1_tap_canh(tap_canh_trai, listPoint, pos)
-#     distance_right = min_distance_den_1_tap_canh(tap_canh_phai, listPoint, pos)
-#     print(distance_left, distance_right)
-#     return distance_left / (distance_left + distance_right)
-
-
-# do_lech_trai_ = do_lech_trai(left_margin_point, right_margin_point, path, pos)
-# print(do_lech_trai_)
