@@ -28,6 +28,8 @@ TRAFFIC_LAMP_COORDINATES = []
 
 
 def nam_giua(node1, node2, point):
+    if node2[0] == point[0] or node2[1] == point[1]:
+        return False
     k1 = (node1[0] - point[0]) / (node2[0] - point[0])
     k2 = (node1[1] - point[1]) / (node2[1] - point[1])
     if round(k1, 1) == round(k2, 1) and k1 < 0:
