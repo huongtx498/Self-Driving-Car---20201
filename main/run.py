@@ -28,7 +28,7 @@ def main():
     position, alpha = map_obj.getInitProp()
     # position = map_obj.position
     # alpha = map_obj.alpha
-    print("LECH TRAI:", map_obj.do_lech_trai(position, alpha))
+    print("LECH TRAI:", map_obj.do_lech_trai(position))
     print("------------------------------------------------------------")
     print("TỌA ĐỘ TẤT CẢ CÁC ĐIỂM: ", map_obj.pos)
     print("------------------------------------------------------------")

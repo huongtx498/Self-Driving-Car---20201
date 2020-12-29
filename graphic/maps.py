@@ -55,8 +55,9 @@ def get_ptdt_qua_2diem(point1, point2):
 
 
 # ax + by + c = 0
-def get_ptdt_qua_xe(position, alpha):
-    return [math.tan(alpha), -1, position[1] - math.tan(alpha) * position[0]]
+def get_ptdt_qua_xe(position, point1, point2):
+    vtpt = (point2[0] - point1[0], point2[1] - point1[1])
+    return [vtpt[0], vtpt[1], (-1) * vtpt[0] * position[0] - vtpt[1] * position[1]]
 
 
 def distance(a, b):
@@ -65,16 +66,20 @@ def distance(a, b):
 
 def get_khoangcach(dt1, node1, node2, position):
     dt2 = get_ptdt_qua_2diem(node1, node2)
+    print("ptdt qua 2 diem:", dt2)
     giaodiem = get_giao_diem_2dt(dt1, dt2)
+    print("nam_giua({}, {}, {})".format(node1, node2, giaodiem))
     if nam_giua(node1, node2, giaodiem):
         return distance(position, giaodiem)
-    return 1000000
+    return min([distance(position, node1), distance(position, node2)])
 
 
-def min_distance_den_1_le(tap_diem_le, position, alpha):
+def min_distance_den_1_le(tap_diem_le, position):
     list_distance = []
-    ptdt_qua_xe = get_ptdt_qua_xe(position, alpha)
     for i in range(0, len(tap_diem_le) - 1):
+        ptdt_qua_xe = get_ptdt_qua_xe(
+            position, tap_diem_le[i], tap_diem_le[i + 1])
+        print("pttd qua xe: ", ptdt_qua_xe)
         khoang_cach = get_khoangcach(
             ptdt_qua_xe, tap_diem_le[i], tap_diem_le[i + 1], position)
         list_distance.append(khoang_cach)
@@ -359,11 +364,11 @@ class Map(pygame.sprite.Sprite):
                     j = j + 1
 
     # tính độ lệch tới lề trái tại 1 thời điểm position: tuple, alpha: float
-    def do_lech_trai(self, position, alpha):
+    def do_lech_trai(self, position):
         distance_left = min_distance_den_1_le(
-            self.left_margin_point, position, alpha)
+            self.left_margin_point, position)
         distance_right = min_distance_den_1_le(
-            self.right_margin_point, position, alpha)
+            self.right_margin_point, position)
         if distance_left == distance_right == 0:
             self.left_dist = 0.0
         else:
