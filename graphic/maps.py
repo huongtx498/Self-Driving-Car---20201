@@ -66,9 +66,9 @@ def distance(a, b):
 
 def get_khoangcach(dt1, node1, node2, position):
     dt2 = get_ptdt_qua_2diem(node1, node2)
-    print("ptdt qua 2 diem:", dt2)
+    # print("ptdt qua 2 diem:", dt2)
     giaodiem = get_giao_diem_2dt(dt1, dt2)
-    print("nam_giua({}, {}, {})".format(node1, node2, giaodiem))
+    # print("nam_giua({}, {}, {})".format(node1, node2, giaodiem))
     if nam_giua(node1, node2, giaodiem):
         return distance(position, giaodiem)
     return min([distance(position, node1), distance(position, node2)])
@@ -79,7 +79,7 @@ def min_distance_den_1_le(tap_diem_le, position):
     for i in range(0, len(tap_diem_le) - 1):
         ptdt_qua_xe = get_ptdt_qua_xe(
             position, tap_diem_le[i], tap_diem_le[i + 1])
-        print("pttd qua xe: ", ptdt_qua_xe)
+        # print("pttd qua xe: ", ptdt_qua_xe)
         khoang_cach = get_khoangcach(
             ptdt_qua_xe, tap_diem_le[i], tap_diem_le[i + 1], position)
         list_distance.append(khoang_cach)
@@ -214,6 +214,15 @@ def side(d, list_points, pos):
     return positives, negatives
 
 
+def merge_point(point1, point2):
+    ip1 = ip2 = (0, 0)
+    for i in point1:
+        if i in point2:
+            ip1 = point1.index(i)
+            ip2 = point2.index(i)
+    return (point1[1 - ip1], point2[1 - ip2])
+
+
 class Map(pygame.sprite.Sprite):
     def __init__(self, init_x, init_y):
         pygame.sprite.Sprite.__init__(self)
@@ -254,6 +263,8 @@ class Map(pygame.sprite.Sprite):
         self.get_map_navs()
         # tính toán ra các tập cạnh
         self.draw_margin()
+        # cắt tỉa ngã 4
+        self.cat_tia_nga4()
         # tách tập cạnh thành 2 tập điểm lề trái và lề phải
         self.getMarginPoint()
 
@@ -458,6 +469,32 @@ class Map(pygame.sprite.Sprite):
                 self.margin_path.remove(margin_line)
         self.margin_path = list(set(self.margin_path))
         return list(self.margin_path)
+
+    def cat_tia_nga4(self):
+        print("LIST ĐIỂM ĐƯỜNG ĐI: ", self.listPoint)
+        print("------------------------------------------------------------")
+        print("TẬP ĐIỂM KỀ: ", self.margin)
+        print("------------------------------------------------------------")
+        print("TẬP CẠNH: ", self.margin_path)
+        print("------------------------------------------------------------")
+        for point in self.listPoint:
+            if check4ways(point, self.margin):
+                list_change_path = []
+                check = []
+                for path in self.margin_path:
+                    if path[0] in self.margin[point] and path[1] in self.margin[point]:
+                        check.append(path[0])
+                        check.append(path[1])
+                        list_change_path.append(path)
+                if len(set(check)) == 3:
+                    print("LIST CHANGE PATH: ", list_change_path)
+                    if len(list_change_path) == 2:
+                        for i in range(0, len(list_change_path) - 1):
+                            appendp = merge_point(
+                                list_change_path[i], list_change_path[i + 1])
+                            self.margin_path.remove(list_change_path[i])
+                            self.margin_path.remove(list_change_path[i + 1])
+                            self.margin_path.append(appendp)
 
     def softLeftRight(self, list1, list2):
         a = b = (0, 0)

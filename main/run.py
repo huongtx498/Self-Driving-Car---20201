@@ -128,7 +128,7 @@ def main():
 
         # update and render car
         deviation = map_obj.do_lech_trai(
-            (cam.x, cam.y), car_angle_to_alpha(controlled_car.dir))
+            (cam.x, cam.y))
         # print('do lech trai:', deviation)
         cars.update(cam.x, cam.y, traffic_lamps_status,
                     stone_status, deviation, flag)
