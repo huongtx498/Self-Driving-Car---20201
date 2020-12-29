@@ -1,0 +1,11 @@
+Distance,Deviation,Speed
+near,left,stop
+near,right,stop
+near,farleft,stop
+near,farright,stop
+near,middle,stop
+medium,farleft,slower
+medium,farright,slower
+medium,left,slow
+medium,right,slow
+medium,middle,medium

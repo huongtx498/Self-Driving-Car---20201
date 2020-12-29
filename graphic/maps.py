@@ -65,9 +65,9 @@ def distance(a, b):
 
 def min_distance_den_1_tap_canh(tap_canh, position, alpha):
     list_distance = []
-    print(tap_canh)
-    print(position)
-    print(alpha)
+    # print(tap_canh)
+    # print(position)
+    # print(alpha)
     ptdt_qua_xe = get_ptdt_qua_xe(position, alpha)
     for i in range(len(tap_canh) - 2):
         toa_do_cur = tap_canh[i]
