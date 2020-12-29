@@ -118,7 +118,8 @@ def main():
             traffic_lamps_status.append(lamp_status)
 
         # update and render car
-        deviation = map_obj.do_lech_trai((cam.x, cam.y), car_angle_to_alpha(controlled_car.dir))
+        deviati
+        on = map_obj.do_lech_trai((cam.x, cam.y), car_angle_to_alpha(controlled_car.dir))
         print('do lech trai:', deviation)
         cars.update(cam.x, cam.y, traffic_lamps_status, stone_status, deviation, flag)
         cars.draw(screen)
