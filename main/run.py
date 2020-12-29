@@ -24,10 +24,11 @@ def main():
     map_obj = maps.Map(0, 0)
     map_s.add(map_obj)
 
-    # map_obj.getInitProp()
-    # position = map_obj.position
-    # alpha = map_obj.alpha
-    # print("LECH TRAI:", map_obj.do_lech_trai(position, alpha))
+    position, alpha = map_obj.getInitProp()
+    print("GOC BAN DAU:", alpha)
+    print("-------------------------------------------------------------")
+    print("LECH TRAI:", map_obj.do_lech_trai(position, alpha))
+    print("-------------------------------------------------------------")
 
     start_x = maps.MAP_NAVS[0][0]
     start_y = maps.MAP_NAVS[0][1]
