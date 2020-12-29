@@ -2,7 +2,7 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 import random
-from graphic.car import calculate_angle
+from graphic.car import calculate_angle, alpha_to_car_angle, car_angle_to_alpha
 from graphic import car
 from pygame.locals import *
 import graphic.traffic_lamp as traffic_lamp
@@ -10,6 +10,7 @@ import graphic.stone as stone
 import pygame
 import graphic.maps as maps
 import graphic.camera as camera
+import math
 
 
 def main():
@@ -25,19 +26,19 @@ def main():
     map_s.add(map_obj)
 
     position, alpha = map_obj.getInitProp()
-    print("GOC BAN DAU:", alpha)
-    print("-------------------------------------------------------------")
+    # position = map_obj.position
+    # alpha = map_obj.alpha
     print("LECH TRAI:", map_obj.do_lech_trai(position, alpha))
-    print("-------------------------------------------------------------")
 
     start_x = maps.MAP_NAVS[0][0]
     start_y = maps.MAP_NAVS[0][1]
     maps.FINISH_INDEX = len(maps.MAP_NAVS) - 1
-
+    alpha_update = alpha_to_car_angle(alpha / math.pi * 180)
     start_angle = calculate_angle(maps.MAP_NAVS[0][0],
                                   maps.MAP_NAVS[0][1], maps.MAP_NAVS[1][0], maps.MAP_NAVS[1][1])
+    print('start angle', start_angle)
     # tính góc của xe: input x1, y1, x2, y2
-    print("Start angle: ", start_angle)
+    print("Start angle: ", alpha_update)
     print("Finish index: ", maps.FINISH_INDEX)
 # khởi tạo đối tượng car với tọa độ x, y và góc hướng
     controlled_car = car.Car(start_x, start_y, start_angle)
@@ -118,7 +119,12 @@ def main():
             traffic_lamps_status.append(lamp_status)
 
         # update and render car
-        cars.update(cam.x, cam.y, traffic_lamps_status, stone_status, flag)
+        deviati
+        on = map_obj.do_lech_trai(
+            (cam.x, cam.y), car_angle_to_alpha(controlled_car.dir))
+        print('do lech trai:', deviation)
+        cars.update(cam.x, cam.y, traffic_lamps_status,
+                    stone_status, deviation, flag)
         cars.draw(screen)
         pygame.display.flip()
 

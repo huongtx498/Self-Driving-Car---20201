@@ -92,7 +92,9 @@ class Graph(object):
 def get_path(start, end):
     # adj_mx, coor = pickle.load(open("/home/jackwiliams/Documents/Fuzzy/Self-Driving-Car---20201/fuzzy_base/point.p", "rb"))
     adj_mx, coor = pickle.load(open(
-        "/home/huongtx/Documents/IT4844/fuzzy-logic-project/fuzzy_base/point.p", "rb"))
+        "../fuzzy_base/point.p", "rb"))
+    adj_mx[42, 57] = 0
+    print(adj_mx[42, 57])
     graph = Graph()
     for i, a in enumerate(adj_mx):
         for j, b in enumerate(a):
@@ -107,4 +109,4 @@ def get_path(start, end):
     return dijkstra.get_path(end), dijkstra.get_distance(end)
 
 
-# get_path(11, 55)
+get_path(11, 55)
