@@ -19,18 +19,20 @@ def rot_center(image, rect, angle):
     rot_rect = rot_image.get_rect(center=rect.center)
     return rot_image, rot_rect
 
+
 def alpha_to_car_angle(alpha):
     if alpha < 0:
         alpha += 360
     alpha = -alpha
     return alpha + 270
 
+
 def car_angle_to_alpha(angle):
     angle -= 270
     angle = -angle
     if angle > 180:
         angle -= 360
-    return angle/180 * PI
+    return angle / 180 * PI
 
 
 def calculate_angle(point_x, point_y, target_x, target_y):
@@ -81,7 +83,7 @@ class Car(pygame.sprite.Sprite):
         self.current_nav_index = 0
         self.current_lamp_pos = 0
         # self.light_deductive = light_deductive.LightDeductive()
-        self.inference_deviation= inference_deviation.DeviationDeductive()
+        self.inference_deviation = inference_deviation.DeviationDeductive()
         self.inference_speed_lamp = inference_speed.Lamp_speed_Deductive()
         self.inference_speed_stone = inference_speed.Stone_speed_Deductive()
 
@@ -196,7 +198,6 @@ class Car(pygame.sprite.Sprite):
             #             "--------------------------------------------------------------------------")
             # self.update_speed()
 
-
             # new
             # way_dir = self.find_way_direction()
             # self.change_dir(way_dir)
@@ -207,7 +208,8 @@ class Car(pygame.sprite.Sprite):
                 if stone_hide_view == 1 and stone_pos <= TRAFFIC_LAMP_POS[self.current_lamp_pos]:
                     distance_stone = self.calculate_distance_impediment(
                         stone_status)
-                    speed_new = self.inference_speed_stone.speed_stone_infe(deviation, distance_stone)
+                    speed_new = self.inference_speed_stone.speed_stone_infe(
+                        deviation, distance_stone)
                     # self.update_acceleration(speed_new)
                     self.speed = speed_new
                     print("Stone - Speed: ", self.speed)
@@ -216,7 +218,8 @@ class Car(pygame.sprite.Sprite):
                 elif stone_hide_view == 1 and self.current_nav_index > TRAFFIC_LAMP_POS[self.current_lamp_pos]:
                     distance_stone = self.calculate_distance_impediment(
                         stone_status)
-                    speed_new = self.inference_speed_stone.speed_stone_infe(deviation, distance_stone)
+                    speed_new = self.inference_speed_stone.speed_stone_infe(
+                        deviation, distance_stone)
                     # self.update_acceleration(speed_new)
                     self.speed = speed_new
                     print("Stone - Speed: ", self.speed)
@@ -225,7 +228,8 @@ class Car(pygame.sprite.Sprite):
                 else:
                     distance_tmp = self.calculate_distance_lamp()
                     lamp_status_tmp = traffic_lamp_status[self.current_lamp_pos][0]
-                    speed_new = self.inference_speed_lamp.speed_lamp_infe(lamp_status_tmp, deviation, distance_tmp)
+                    speed_new = self.inference_speed_lamp.speed_lamp_infe(
+                        lamp_status_tmp, deviation, distance_tmp)
                     print('--------speed infe', speed_new)
                     self.update_acceleration(speed_new)
                     # self.speed = speed_new
@@ -234,12 +238,11 @@ class Car(pygame.sprite.Sprite):
                         "--------------------------------------------------------------------------")
             self.update_speed()
 
-
         else:
             self.set_speed(0)
         print('----speed', self.speed)
         print(self.dir)
-        self.dir += (steering-0.5) * 120
+        self.dir += (steering - 0.5) * 120
         print(self.dir)
         self.x = self.x + self.speed * math.cos(math.radians(270 - self.dir))
         self.y = self.y + self.speed * math.sin(math.radians(270 - self.dir))

@@ -29,17 +29,25 @@ def main():
     # position = map_obj.position
     # alpha = map_obj.alpha
     print("LECH TRAI:", map_obj.do_lech_trai(position, alpha))
-
+    print("------------------------------------------------------------")
+    print("TỌA ĐỘ TẤT CẢ CÁC ĐIỂM: ", map_obj.pos)
+    print("------------------------------------------------------------")
+    print("LIST ĐIỂM ĐƯỜNG ĐI: ", map_obj.listPoint)
+    print("------------------------------------------------------------")
+    print("TẬP ĐIỂM KỀ: ", map_obj.margin)
+    print("------------------------------------------------------------")
+    print("TẬP CẠNH: ", map_obj.margin_path)
+    print("------------------------------------------------------------")
+    print("ID ĐIỂM LỀ TRÁI: ", map_obj.left_point_index)
+    print("------------------------------------------------------------")
+    print("ID ĐIỂM LỀ PHẢI: ", map_obj.right_point_index)
+    print("------------------------------------------------------------")
     start_x = maps.MAP_NAVS[0][0]
     start_y = maps.MAP_NAVS[0][1]
     maps.FINISH_INDEX = len(maps.MAP_NAVS) - 1
     alpha_update = alpha_to_car_angle(alpha / math.pi * 180)
     start_angle = calculate_angle(maps.MAP_NAVS[0][0],
                                   maps.MAP_NAVS[0][1], maps.MAP_NAVS[1][0], maps.MAP_NAVS[1][1])
-    print('start angle', start_angle)
-    # tính góc của xe: input x1, y1, x2, y2
-    print("Start angle: ", alpha_update)
-    print("Finish index: ", maps.FINISH_INDEX)
 # khởi tạo đối tượng car với tọa độ x, y và góc hướng
     controlled_car = car.Car(start_x, start_y, start_angle)
     cars = pygame.sprite.Group()  # nhóm đối tượng car
@@ -121,7 +129,7 @@ def main():
         # update and render car
         deviation = map_obj.do_lech_trai(
             (cam.x, cam.y), car_angle_to_alpha(controlled_car.dir))
-        print('do lech trai:', deviation)
+        # print('do lech trai:', deviation)
         cars.update(cam.x, cam.y, traffic_lamps_status,
                     stone_status, deviation, flag)
         cars.draw(screen)

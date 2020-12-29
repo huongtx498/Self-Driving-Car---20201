@@ -222,10 +222,14 @@ class Map(pygame.sprite.Sprite):
         self.listPoint = []
         # margin_path :list các cạnh
         self.margin_path = []
-        # left_margin_point :list các điểm bên lề trái (theo thứ tự xuất phát => kết thúc)
+        # left_margin_point :list tọa độ các điểm bên lề trái (theo thứ tự xuất phát => kết thúc)
         self.left_margin_point = []
-        # right_margin_point :list các điểm bên lề phải (theo thứ tự xuất phát => kết thúc)
+        # right_margin_point :list tọa độ các điểm bên lề phải (theo thứ tự xuất phát => kết thúc)
         self.right_margin_point = []
+        # left_point_index: list index các điểm lề trái
+        self.left_point_index = []
+        # right_point_index: list index các điểm lề phải
+        self.right_point_index = []
         # left_dist: độ lệch trái tại 1 thời điểm
         self.left_dist = 0
         # position: tọa độ xe hiện tại
@@ -253,15 +257,6 @@ class Map(pygame.sprite.Sprite):
         blue = 230, 30, 30
         pygame.draw.lines(self.image, blue, False, self.left_margin_point, 5)
         pygame.draw.lines(self.image, blue, False, self.right_margin_point, 5)
-
-        print("TỌA ĐỘ TẤT CẢ CÁC ĐIỂM: ", self.pos)
-        print("------------------------------------------------------------")
-        print("LIST ĐIỂM ĐƯỜNG ĐI: ", self.listPoint)
-        print("------------------------------------------------------------")
-        print("TẬP ĐIỂM KỀ: ", self.margin)
-        print("------------------------------------------------------------")
-        print("TẬP CẠNH: ", self.margin_path)
-        print("------------------------------------------------------------")
 
     # Realign the map
 
@@ -506,13 +501,10 @@ class Map(pygame.sprite.Sprite):
         start = getStartPoint(listP, self.margin)
         margin_point_index_1 = getMarginLine(start[0], self.margin_path)
         margin_point_index_2 = getMarginLine(start[1], self.margin_path)
-        left_point_index, right_point_index = self.softLeftRight(
+        self.left_point_index, self.right_point_index = self.softLeftRight(
             margin_point_index_1, margin_point_index_2)
-        self.left_margin_point = converIndexToNavs(left_point_index, self.pos)
+        self.left_margin_point = converIndexToNavs(
+            self.left_point_index, self.pos)
         self.right_margin_point = converIndexToNavs(
-            right_point_index, self.pos)
-        print("ID ĐIỂM LỀ TRÁI: ", left_point_index)
-        print("------------------------------------------------------------")
-        print("ID ĐIỂM LỀ PHẢI: ", right_point_index)
-        print("------------------------------------------------------------")
+            self.right_point_index, self.pos)
         return self.left_margin_point, self.right_margin_point
