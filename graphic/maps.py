@@ -27,57 +27,55 @@ TRAFFIC_LAMP_POS = []
 TRAFFIC_LAMP_COORDINATES = []
 
 
-def he_so_goc(alpha):
-    return math.tan(alpha)
+def nam_giua(node1, node2, point):
+    k1 = (node1[0] - point[0]) / (node2[0] - point[0])
+    k2 = (node1[1] - point[1]) / (node2[1] - point[1])
+    if round(k1, 1) == round(k2, 1) and k1 < 0:
+        return True
+    return False
 
 
-def get_ptdt(P, Q):
-    # [1,2], [3,4] => ax + by = c
-    a = Q[1] - P[1]
-    b = P[0] - Q[0]
-    c = a * (P[0]) + b * (P[1])
-    return a, b, c
+def get_giao_diem_2dt(dt1, dt2):
+    if dt2[0] == dt1[0] * dt2[1] / dt1[1]:
+        return (0, 0)
+    x = (dt1[2] * dt2[1] / dt1[1] - dt2[2]) / \
+        (dt2[0] - dt1[0] * dt2[1] / dt1[1])
+    y = (dt1[0] * x + dt1[2]) / ((-1) * dt1[1])
+    return (x, y)
 
 
-def get_giao_diem(arr1, arr2):
-    # [4,3,32], [4,-2,12] => [x, y]
-    a = np.array([[arr1[0], arr1[1]], [arr2[0], arr2[1]]])
-    b = np.array([arr1[2], arr2[2]])
-    try:
-        return np.linalg.solve(a, b)
-    except:
+def get_ptdt_qua_2diem(point1, point2):
+    if point2[0] == point1[0]:
         return None
+    a = (point2[1] - point1[1]) / (point2[0] - point1[0])
+    b = point1[1] - a * point1[0]
+    return [a, -1, b]
 
 
+# ax + by + c = 0
 def get_ptdt_qua_xe(position, alpha):
-    k = he_so_goc(alpha)
-    a, b, c = (
-        k,
-        -1,
-        k * position[0] - position[1],
-    )  # ax + by = c, ptdt qua tam xe va tao voi truc Ox 1 goc
-    return -b, a, -(-b * position[0] + a * position[1])
+    return [math.tan(alpha), -1, position[1] - math.tan(alpha) * position[0]]
 
 
 def distance(a, b):
     return math.dist(a, b)
 
 
-def min_distance_den_1_tap_canh(tap_canh, position, alpha):
+def get_khoangcach(dt1, node1, node2, position):
+    dt2 = get_ptdt_qua_2diem(node1, node2)
+    giaodiem = get_giao_diem_2dt(dt1, dt2)
+    if nam_giua(node1, node2, giaodiem):
+        return distance(position, giaodiem)
+    return 1000000
+
+
+def min_distance_den_1_le(tap_diem_le, position, alpha):
     list_distance = []
-    print(tap_canh)
-    print(position)
-    print(alpha)
     ptdt_qua_xe = get_ptdt_qua_xe(position, alpha)
-    for i in range(len(tap_canh) - 2):
-        toa_do_cur = tap_canh[i]
-        toan_do_next = tap_canh[i + 1]
-        ptdt = get_ptdt(toa_do_cur, toan_do_next)
-        giao_diem = get_giao_diem(ptdt, ptdt_qua_xe)
-        if giao_diem is not None:
-            list_distance.append(distance(position, giao_diem))
-        else:
-            list_distance.append(999999999)
+    for i in range(0, len(tap_diem_le) - 1):
+        khoang_cach = get_khoangcach(
+            ptdt_qua_xe, tap_diem_le[i], tap_diem_le[i + 1], position)
+        list_distance.append(khoang_cach)
     if list_distance == []:
         return 0
     return min(list_distance)
@@ -365,9 +363,9 @@ class Map(pygame.sprite.Sprite):
 
     # tính độ lệch tới lề trái tại 1 thời điểm position: tuple, alpha: float
     def do_lech_trai(self, position, alpha):
-        distance_left = min_distance_den_1_tap_canh(
+        distance_left = min_distance_den_1_le(
             self.left_margin_point, position, alpha)
-        distance_right = min_distance_den_1_tap_canh(
+        distance_right = min_distance_den_1_le(
             self.right_margin_point, position, alpha)
         if distance_left == distance_right == 0:
             self.left_dist = 0.0
@@ -465,7 +463,7 @@ class Map(pygame.sprite.Sprite):
         current_index = self.listPoint[0]
         target_index = self.listPoint[1]
         next_ = None
-        l = len(self.listPoint)
+        list_margin = []
         for index, obj in enumerate(self.listPoint):
             if index < len(self.listPoint) - 1:
                 next_ = self.listPoint[index + 1]
@@ -497,6 +495,7 @@ class Map(pygame.sprite.Sprite):
     # lấy ra tập điểm trái và phải của lề (trả về  theo thứ tự trái, phải)
 
     def getMarginPoint(self):
+        # listP: list các điểm xuất hiện 1 lần trong tập cạnh
         listP = []
         for subpath in self.margin_path:
             for point in subpath:
